@@ -4,25 +4,29 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
-# ROL RENK HARİTASI (HEX KODLARI)
-# Her rol için ayırt edici özel bir renk tanımlıyoruz.
+# ROL RENK HARİTASI (YÜKSEK KONTRAST - 16 FARKLI RENK)
 role_color_map = {
-    "Inverted Winger / Dribbler": "#FF3366",      # Parlak Pembe/Kırmızı
-    "Defensive Midfielder / Anchor": "#0066CC",   # Koyu Mavi
-    "Target Man / Aerial Threat": "#FF9900",      # Turuncu
-    "Versatile Forward / Second Striker": "#FFCC00", # Altın Sarısı
-    "Poacher / Penalty Box Striker": "#CC0000",   # Koyu Kırmızı
-    "Elite Speedster / Direct Winger": "#00FF99", # Neon Yeşil (Hız vurgusu)
-    "Utility Player / Workhorse": "#808080",      # Gri (Nötr)
-    "Pressing Forward": "#CCFF00",                # Limon Yeşili
-    "Stopper / No-Nonsense Defender": "#000066",  # Lacivert
-    "Deep Distributor / Ball Playing CB": "#00FFFF", # Cam Göbeği (Cyan)
-    "Physical Ball Carrier": "#9933FF",           # Mor
-    "Progressive Passer / Controller": "#3366FF", # Kraliyet Mavisi
-    "Central Defender (Standard)": "#3399FF",     # Açık Mavi
-    "Wide Midfielder / Defensive Winger": "#009933", # Koyu Yeşil
-    "Technical Hub / Deep Playmaker": "#FF00FF",  # Magenta (Yaratıcılık)
-    "Commanding Center Back": "#003300"           # Çok Koyu Yeşil/Siyah
+    # --- HÜCUMCULAR (Sıcak ve Parlak Renkler) ---
+    "Inverted Winger / Dribbler": "#FF0000",       # Saf Kırmızı (Çok Dikkat Çekici)
+    "Elite Speedster / Direct Winger": "#FF00FF",  # Magenta / Parlak Pembe
+    "Poacher / Penalty Box Striker": "#FFA500",    # Turuncu
+    "Versatile Forward / Second Striker": "#FFFF00", # Saf Sarı
+    "Target Man / Aerial Threat": "#FF69B4",       # Hot Pink (Şeker Pembesi)
+    "Pressing Forward": "#00FF00",                 # Neon Yeşil (Enerji Vurgusu)
+
+    # --- ORTA SAHALAR (Teknik ve Ara Renkler) ---
+    "Technical Hub / Deep Playmaker": "#00FFFF",   # Cyan / Turkuaz (Parlak)
+    "Progressive Passer / Controller": "#1E90FF",  # Dodger Blue (Parlak Mavi)
+    "Physical Ball Carrier": "#9932CC",            # Dark Orchid (Mor)
+    "Defensive Midfielder / Anchor": "#8B4513",    # Saddle Brown (Kahverengi - Toprak Rengi)
+    "Wide Midfielder / Defensive Winger": "#7FFF00", # Chartreuse (Sarı-Yeşil Karışımı)
+    "Utility Player / Workhorse": "#A9A9A9",       # Dark Gray (Gümüş/Gri - Nötr)
+
+    # --- DEFANSLAR (Koyu ve Soğuk Renkler) ---
+    "Deep Distributor / Ball Playing CB": "#008080", # Teal (Ördek Başı Yeşili)
+    "Stopper / No-Nonsense Defender": "#800000",   # Maroon (Bordo)
+    "Central Defender (Standard)": "#000080",      # Navy (Lacivert - En Koyu Mavi)
+    "Commanding Center Back": "#FFFFFF"            # Beyaz (Koyu tema üzerinde Lider gibi parlasın)
 }
 
 # 1. SAYFA AYARLARI
@@ -128,5 +132,6 @@ with col2:
     else:
 
         st.info("👈 Detaylar için soldan filtreleyin veya oyuncu seçin.")
+
 
 
