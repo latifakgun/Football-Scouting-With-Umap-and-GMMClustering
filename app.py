@@ -36,7 +36,7 @@ if selected_pos:
     roles = sorted(df[df['General_Position'].isin(selected_pos)]['Role_Name'].unique())
 else:
     roles = sorted(df['Role_Name'].unique())
-selected_roles = st.sidebar.multiselect("Yapay Zeka Rolü", roles)
+selected_roles = st.sidebar.multiselect("Rol", roles)
 
 # Oyuncu Arama
 st.sidebar.markdown("---")
@@ -106,3 +106,4 @@ with col2:
     else:
 
         st.info("👈 Detaylar için soldan filtreleyin veya oyuncu seçin.")
+
