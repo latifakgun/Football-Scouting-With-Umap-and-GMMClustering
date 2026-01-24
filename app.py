@@ -10,7 +10,7 @@ st.set_page_config(page_title="Eyeball Scout", page_icon="⚽", layout="wide")
 # 2. VERİ YÜKLEME
 @st.cache_data
 def load_data():
-    df = pd.read_csv("Eyeball_Streamlit_Final.csv")
+    df = pd.read_csv("eyeball_streamlit_final.csv")
     return df
 
 try:
@@ -104,4 +104,5 @@ with col2:
         for _, s in similars.iterrows():
             st.write(f"- **{s['Player']}** ({s['Squad']})")
     else:
+
         st.info("👈 Detaylar için soldan filtreleyin veya oyuncu seçin.")
