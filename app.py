@@ -4,6 +4,27 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
+# ROL RENK HARİTASI (HEX KODLARI)
+# Her rol için ayırt edici özel bir renk tanımlıyoruz.
+role_color_map = {
+    "Inverted Winger / Dribbler": "#FF3366",      # Parlak Pembe/Kırmızı
+    "Defensive Midfielder / Anchor": "#0066CC",   # Koyu Mavi
+    "Target Man / Aerial Threat": "#FF9900",      # Turuncu
+    "Versatile Forward / Second Striker": "#FFCC00", # Altın Sarısı
+    "Poacher / Penalty Box Striker": "#CC0000",   # Koyu Kırmızı
+    "Elite Speedster / Direct Winger": "#00FF99", # Neon Yeşil (Hız vurgusu)
+    "Utility Player / Workhorse": "#808080",      # Gri (Nötr)
+    "Pressing Forward": "#CCFF00",                # Limon Yeşili
+    "Stopper / No-Nonsense Defender": "#000066",  # Lacivert
+    "Deep Distributor / Ball Playing CB": "#00FFFF", # Cam Göbeği (Cyan)
+    "Physical Ball Carrier": "#9933FF",           # Mor
+    "Progressive Passer / Controller": "#3366FF", # Kraliyet Mavisi
+    "Central Defender (Standard)": "#3399FF",     # Açık Mavi
+    "Wide Midfielder / Defensive Winger": "#009933", # Koyu Yeşil
+    "Technical Hub / Deep Playmaker": "#FF00FF",  # Magenta (Yaratıcılık)
+    "Commanding Center Back": "#003300"           # Çok Koyu Yeşil/Siyah
+}
+
 # 1. SAYFA AYARLARI
 st.set_page_config(page_title="Eyeball Scout", page_icon="⚽", layout="wide")
 
@@ -61,6 +82,7 @@ with col1:
         fig = px.scatter_3d(
             filtered_df, x='x', y='y', z='z',
             color='Role_Name',
+            color_discrete_map=role_color_map,
             hover_name='Player',
             hover_data=['Squad', 'Age', 'Goals', 'Assists'],
             opacity=0.7, size_max=10, template='plotly_dark',
@@ -106,4 +128,5 @@ with col2:
     else:
 
         st.info("👈 Detaylar için soldan filtreleyin veya oyuncu seçin.")
+
 
