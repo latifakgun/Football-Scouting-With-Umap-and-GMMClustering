@@ -283,53 +283,32 @@ with tab2:
             except:
                 return x
         
-       def highlight_winner(row):
-            # İlk iki sütun (Kategori, Metrik) hariç, oyuncu sütunlarını al
-            col1_name = row.index[2]
-            col2_name = row.index[3]
-            
-            v1 = row[col1_name]
-            v2 = row[col2_name]
-            
-            # Varsayılan stil (Nötr)
+# RENKLENDİRME FONKSİYONU (Girinti hatası olmaması için buraya aldık)
+        def highlight_winner(row):
+            col1_name, col2_name = row.index[2], row.index[3]
+            v1, v2 = row[col1_name], row[col2_name]
             styles = ['' for _ in row]
             
-            # CSS Stilleri
-            # Kazanan: Parlak Yeşil, Kalın Font, Hafif Parlama
             winner_style = 'color: #00FF7F; font-weight: 900; text-shadow: 0 0 5px rgba(0,255,127,0.5); font-size: 1.1em;'
-            # Kaybeden: Soluk Gri, Opaklık Düşük
             loser_style = 'color: #666; font-weight: normal; opacity: 0.5;'
-            # Eşitlik: Standart Beyaz
             draw_style = 'color: white;'
 
             try:
-                val1 = float(v1)
-                val2 = float(v2)
-
+                val1, val2 = float(v1), float(v2)
                 if val1 > val2:
-                    styles[2] = winner_style
-                    styles[3] = loser_style
+                    styles[2], styles[3] = winner_style, loser_style
                 elif val2 > val1:
-                    styles[2] = loser_style
-                    styles[3] = winner_style
+                    styles[2], styles[3] = loser_style, winner_style
                 else:
-                    styles[2] = draw_style
-                    styles[3] = draw_style
-            except:
-                pass
-                
+                    styles[2], styles[3] = draw_style, draw_style
+            except: pass
             return styles
 
-        # C. TABLOYU ÇİZ (Styler Kullanarak)
-        # format() fonksiyonu sadece görüntüyü değiştirir, arkadaki sayısal değeri bozmaz.
-        # Bu sayede highlight_winner fonksiyonu hala sayıları karşılaştırabilir.
         st.dataframe(
             comp_df.style
             .apply(highlight_winner, axis=1)
-            .format(smart_format, subset=comp_df.columns[2:]), # Sadece sayısal sütunlara format uygula
-            use_container_width=True,
-            height=600,
-            hide_index=True
+            .format(smart_format, subset=comp_df.columns[2:]),
+            use_container_width=True, height=600, hide_index=True
         )
 
 # ALTLIK
@@ -341,4 +320,5 @@ st.markdown("""
     UMAP & CA
 </div>
 """, unsafe_allow_html=True)
+
 
