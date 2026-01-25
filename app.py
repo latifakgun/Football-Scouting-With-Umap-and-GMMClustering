@@ -13,11 +13,19 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ÖZEL CSS: Uygulamanın havasını değiştiren tasarım kodları
+# ÖZEL CSS: UI Düzeltmeleri
 st.markdown("""
     <style>
-        /* Ana font ve arka plan ayarları */
-        .block-container { padding-top: 1rem; padding-bottom: 1rem; }
+        /* 1. Üstteki standart Streamlit çubuğunu gizle (Sorunu çıkaran dikdörtgen) */
+        header {visibility: hidden;}
+        
+        /* 2. Ana içerik bloğunu aşağı it (Sekmelerin görünmesi için) */
+        .block-container {
+            padding-top: 2rem; /* 1rem az geliyordu, 2rem yaptık */
+            padding-bottom: 1rem;
+        }
+        
+        /* Ana font ayarları */
         h1, h2, h3 { font-family: 'Helvetica Neue', sans-serif; font-weight: 700; }
         
         /* Kart Görünümü */
@@ -29,12 +37,12 @@ st.markdown("""
             text-align: center;
         }
         
-        /* Tablo Başlıkları */
+        /* Tablo Başlıklarını Gizle (Daha temiz görünüm için) */
         thead tr th:first-child { display:none }
         tbody th { display:none }
         
-        /* Kazananı vurgulayan renkler */
-        .winner-green { color: #00FF7F; font-weight: bold; }
+        /* Tablo Yazı Tipi */
+        td { font-size: 1.1em !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -74,12 +82,12 @@ role_color_map = {
 
 # 3. YAN PANEL (SIDEBAR)
 # ---------------------------------------------------------
-st.sidebar.title("🔍 Scout Paneli")
+st.sidebar.title("Scouting Tab")
 st.sidebar.markdown("---")
 
 # A. Sezon
 all_seasons = sorted(df['Season'].unique(), reverse=True)
-selected_seasons = st.sidebar.multiselect("📅 Sezon", all_seasons, default=all_seasons[:1])
+selected_seasons = st.sidebar.multiselect("Season", all_seasons, default=all_seasons[:1])
 
 if selected_seasons:
     df_filtered_season = df[df['Season'].isin(selected_seasons)]
@@ -88,18 +96,18 @@ else:
 
 # B. Takım
 teams = sorted(df_filtered_season['Squad'].unique())
-selected_teams = st.sidebar.multiselect("Takım", teams)
+selected_teams = st.sidebar.multiselect("Squad", teams)
 
 # C. Mevki (Bölge yerine)
 positions = sorted(df_filtered_season['General_Position'].unique())
-selected_pos = st.sidebar.multiselect("Mevki", positions)
+selected_pos = st.sidebar.multiselect("Position", positions)
 
 # D. Rol (Yapay Zeka Rolü yerine)
 if selected_pos:
     roles = sorted(df_filtered_season[df_filtered_season['General_Position'].isin(selected_pos)]['Role_Name'].unique())
 else:
     roles = sorted(df_filtered_season['Role_Name'].unique())
-selected_roles = st.sidebar.multiselect("Rol", roles)
+selected_roles = st.sidebar.multiselect("Role", roles)
 
 # Filtreleme
 final_df = df_filtered_season.copy()
@@ -110,14 +118,14 @@ if selected_roles: final_df = final_df[final_df['Role_Name'].isin(selected_roles
 
 # 4. ANA EKRAN
 # ---------------------------------------------------------
-tab1, tab2 = st.tabs(["🌍 3D Keşif", "⚖️ Oyuncu Karşılaştırma"])
+tab1, tab2 = st.tabs(["🌍 3D Exploration", "⚖️ Player Comparison"])
 
 # --- TAB 1: 3D KEŞİF ---
 with tab1:
     col_search, col_space = st.columns([1, 3])
     with col_search:
-        search_list = ["Seçiniz..."] + sorted(final_df['Display_Name'].unique().tolist())
-        selected_player_search = st.selectbox("Oyuncuya Zoom Yap:", search_list)
+        search_list = ["Select..."] + sorted(final_df['Display_Name'].unique().tolist())
+        selected_player_search = st.selectbox("Zoom to the Player:", search_list)
 
     if not final_df.empty:
         fig = px.scatter_3d(
@@ -126,42 +134,42 @@ with tab1:
             hover_name='Display_Name',
             hover_data=['Age', 'Goals', 'Assists', 'Minutes'],
             opacity=0.8, size_max=12, template='plotly_dark',
-            title=f"Oyuncu Havuzu: {len(final_df)}"
+            title=f"Player Pool: {len(final_df)}"
         )
         fig.update_layout(
             scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor='rgba(0,0,0,0)'),
             margin=dict(l=0, r=0, b=0, t=30), height=600,
             legend=dict(x=0, y=1, font=dict(size=10))
         )
-        if selected_player_search != "Seçiniz...":
+        if selected_player_search != "Select...":
             p_data = df[df['Display_Name'] == selected_player_search]
             if not p_data.empty:
                 fig.add_trace(go.Scatter3d(
                     x=p_data['x'], y=p_data['y'], z=p_data['z'],
                     mode='markers', marker=dict(size=25, color='white', symbol='diamond', line=dict(width=2, color='black')),
-                    name='SEÇİLEN', hoverinfo='text', hovertext=selected_player_search
+                    name='SELECTED', hoverinfo='text', hovertext=selected_player_search
                 ))
         st.plotly_chart(fig, use_container_width=True)
         
         # CSV İndirme Butonu (İsteğe Bağlı)
-        with st.expander("📥 Veriyi İndir"):
+        with st.expander("📥 Download CSV"):
             st.download_button(
-                label="Filtrelenmiş Veriyi CSV Olarak İndir",
+                label="Download Filtered Data as CSV",
                 data=final_df.to_csv(index=False).encode('utf-8'),
-                file_name='scout_listesi.csv',
+                file_name='filtered_data.csv',
                 mime='text/csv'
             )
 
 # --- TAB 2: KARŞILAŞTIRMA (GELİŞMİŞ) ---
 with tab2:
-    st.markdown("### ⚔️ Oyuncu Kıyaslama")
+    st.markdown("### ⚔️ Player Comparison")
     
     all_players_list = sorted(df['Display_Name'].unique().tolist())
     c1, c2 = st.columns(2)
     with c1:
-        p1_name = st.selectbox("1. Oyuncu", all_players_list, index=0)
+        p1_name = st.selectbox("1st Player", all_players_list, index=0)
     with c2:
-        p2_name = st.selectbox("2. Oyuncu", all_players_list, index=min(10, len(all_players_list)-1))
+        p2_name = st.selectbox("2nd Player", all_players_list, index=min(10, len(all_players_list)-1))
 
     if p1_name and p2_name:
         p1 = df[df['Display_Name'] == p1_name].iloc[0]
@@ -172,11 +180,11 @@ with tab2:
         with col1:
             st.success(f"🔵 {p1['Player']}")
             st.caption(f"{p1['Squad']} | {p1['Season']}")
-            st.metric("Rol", p1['Role_Name'])
+            st.metric("Role", p1['Role_Name'])
         with col2:
             st.error(f"🔴 {p2['Player']}")
             st.caption(f"{p2['Squad']} | {p2['Season']}")
-            st.metric("Rol", p2['Role_Name'])
+            st.metric("Role", p2['Role_Name'])
         
         st.markdown("---")
 
@@ -227,7 +235,7 @@ with tab2:
         fig_radar.update_layout(
             polar=dict(radialaxis=dict(visible=False)), # Eksen sayılarını gizle (kafa karıştırmasın)
             showlegend=True,
-            title="Yetenek Dağılımı (Göreceli Kıyaslama)",
+            title="Statistics Radar",
             height=450,
             template="plotly_dark",
             paper_bgcolor='rgba(0,0,0,0)',
@@ -236,13 +244,13 @@ with tab2:
         st.plotly_chart(fig_radar, use_container_width=True)
 
         # 3. GELİŞMİŞ TABLO (Kazananı Vurgulama)
-        st.subheader("📋 İstatistik Tablosu")
+        st.subheader("Statistics Comparison")
         
         compare_metrics = {
-            'Hücum': ['Goals', 'Assists', 'Shots', 'SoT', 'npxG_p90', 'xA_p90'],
-            'Oyun Kurma': ['Prg_Pass_Dist', 'Prg_Carry_Dist', 'GCA', 'SCA', 'Pass_Cmp_Pct'],
-            'Defans': ['Tackles', 'Interceptions', 'Blocks'],
-            'Genel': ['Minutes', 'Age', 'Role_Probability']
+            'Attacking': ['Goals', 'Assists', 'Shots', 'SoT', 'npxG_p90', 'xA_p90'],
+            'Playmaking': ['Prg_Pass_Dist', 'Prg_Carry_Dist', 'GCA', 'SCA', 'Pass_Cmp_Pct'],
+            'Defencing': ['Tackles', 'Interceptions', 'Blocks'],
+            'General': ['Minutes', 'Age', 'Role_Probability']
         }
         
         # Pandas Styler kullanarak tabloyu boyuyoruz
@@ -256,50 +264,81 @@ with tab2:
                 diff = val1 - val2
                 
                 rows.append({
-                    "Kategori": category,
-                    "Metrik": m,
+                    "Category": category,
+                    "Metric": m,
                     f"{p1['Player']}": val1,
                     f"{p2['Player']}": val2,
                 })
         
         comp_df = pd.DataFrame(rows)
+
+        def smart_format(x):
+            try:
+                if isinstance(x, (int, float)):
+                    if x % 1 == 0:
+                        return f"{x:.0f}"
+                    else:
+                        return f"{x:.2f}"
+                return x
+            except:
+                return x
         
-        # Tabloyu Güzelleştirme Fonksiyonu
-        def highlight_winner(row):
-            # 1. ve 2. oyuncunun sütun isimlerini al
-            col1 = row.index[2]
-            col2 = row.index[3]
+       def highlight_winner(row):
+            # İlk iki sütun (Kategori, Metrik) hariç, oyuncu sütunlarını al
+            col1_name = row.index[2]
+            col2_name = row.index[3]
             
-            v1 = row[col1]
-            v2 = row[col2]
+            v1 = row[col1_name]
+            v2 = row[col2_name]
             
-            # Stilleri tanımla
+            # Varsayılan stil (Nötr)
             styles = ['' for _ in row]
             
-            # Sayısal olmayanları geç (Kategori ismi vs)
+            # CSS Stilleri
+            # Kazanan: Parlak Yeşil, Kalın Font, Hafif Parlama
+            winner_style = 'color: #00FF7F; font-weight: 900; text-shadow: 0 0 5px rgba(0,255,127,0.5); font-size: 1.1em;'
+            # Kaybeden: Soluk Gri, Opaklık Düşük
+            loser_style = 'color: #666; font-weight: normal; opacity: 0.5;'
+            # Eşitlik: Standart Beyaz
+            draw_style = 'color: white;'
+
             try:
-                if float(v1) > float(v2):
-                    styles[2] = 'background-color: #1f3a28; color: #4ade80; font-weight: bold; border: 1px solid #4ade80' # Koyu yeşil arka plan, açık yeşil yazı
-                elif float(v2) > float(v1):
-                    styles[3] = 'background-color: #3a1f1f; color: #f87171; font-weight: bold; border: 1px solid #f87171' # Koyu kırmızı arka plan
+                val1 = float(v1)
+                val2 = float(v2)
+
+                if val1 > val2:
+                    styles[2] = winner_style
+                    styles[3] = loser_style
+                elif val2 > val1:
+                    styles[2] = loser_style
+                    styles[3] = winner_style
+                else:
+                    styles[2] = draw_style
+                    styles[3] = draw_style
             except:
                 pass
                 
             return styles
 
-        # Pandas Styler Uygula
+        # C. TABLOYU ÇİZ (Styler Kullanarak)
+        # format() fonksiyonu sadece görüntüyü değiştirir, arkadaki sayısal değeri bozmaz.
+        # Bu sayede highlight_winner fonksiyonu hala sayıları karşılaştırabilir.
         st.dataframe(
-            comp_df.style.apply(highlight_winner, axis=1),
+            comp_df.style
+            .apply(highlight_winner, axis=1)
+            .format(smart_format, subset=comp_df.columns[2:]), # Sadece sayısal sütunlara format uygula
             use_container_width=True,
-            height=600
+            height=600,
+            hide_index=True
         )
 
 # ALTLIK
 st.markdown("---")
 st.markdown("""
 <div style="text-align: center; color: grey;">
-    Eyeball Scout Pro v3.0 | 
-    <span style="color: #4ade80;">Mevki & Rol Analizi</span> | 
-    Powered by AI
+    Eyeball Scout | 
+    <span style="color: #4ade80;">Position & Role Analysis</span> | 
+    UMAP & CA
 </div>
 """, unsafe_allow_html=True)
+
