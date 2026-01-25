@@ -4,92 +4,107 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
-# 1. PAGE CONFIGURATION & PREMIUM CSS
+# 1. PAGE CONFIGURATION
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="Eyeball Scout",
+    page_title="Eyeball Scout | Pro Analytics",
     page_icon="⚽",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# CUSTOM CSS INJECTION (The UI Overhaul)
+# 2. ULTRA SMOOTH CSS (YENİ TASARIM)
+# ---------------------------------------------------------
 st.markdown("""
     <style>
         /* IMPORT GOOGLE FONT 'INTER' */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
-        /* GENERAL SETTINGS */
-        * { font-family: 'Inter', sans-serif; }
-        .stApp { background-color: #0B0E11; color: #E0E0E0; }
+        /* --- GENERAL SETTINGS --- */
+        * { font-family: 'Inter', sans-serif !important; }
         
-        /* HIDE DEFAULT HEADER & FOOTER */
-        header {visibility: hidden;}
-        footer {visibility: hidden;}
-        
-        /* ADJUST PADDING FOR HEADER VISIBILITY ISSUE */
-        .block-container { padding-top: 2rem; padding-bottom: 2rem; }
-
-        /* SIDEBAR STYLING */
-        [data-testid="stSidebar"] { background-color: #151A21; border-right: 1px solid #2A2F3A; }
-        
-        /* HEADERS */
-        h1, h2, h3 { font-weight: 700; color: #FFFFFF; }
-        .main-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(90deg, #4ADE80, #3B82F6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0px;
+        .stApp { 
+            background-color: #0B0E11; 
+            color: #E0E0E0; 
         }
-        .sub-title { font-size: 1rem; color: #9CA3AF; margin-bottom: 20px; }
+        
+        /* --- SMOOTH TABS (YUMUŞAK SEKME TASARIMI) --- */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 8px;
+            background-color: transparent;
+            padding-bottom: 5px;
+        }
+        
+        .stTabs [data-baseweb="tab"] {
+            height: 55px;
+            background-color: #151A21;
+            border-radius: 16px 16px 0px 0px; /* Üst köşeler yuvarlak */
+            border: 1px solid #2A2F3A;
+            border-bottom: none;
+            color: #9CA3AF;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .stTabs [aria-selected="true"] {
+            background-color: #1F252E;
+            color: #4ADE80; /* Neon Yeşil Yazı */
+            font-weight: 600;
+            border-top: 2px solid #4ADE80;
+        }
 
-        /* METRIC CARDS */
+        /* --- SMOOTH CARDS & METRICS --- */
         div[data-testid="stMetric"] {
             background-color: #1F252E;
             border: 1px solid #2F3642;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s;
+            padding: 20px;
+            border-radius: 16px; /* Daha yuvarlak */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
-        div[data-testid="stMetric"]:hover {
-            transform: translateY(-2px);
-            border-color: #4ADE80;
+        
+        /* --- INPUT FIELDS (SEÇİM KUTULARI) --- */
+        .stSelectbox div[data-baseweb="select"] > div,
+        .stMultiSelect div[data-baseweb="select"] > div {
+            background-color: #151A21;
+            border-color: #2F3642;
+            border-radius: 12px; /* Inputlar da yuvarlak */
+            color: white;
         }
-        div[data-testid="stMetricLabel"] { color: #9CA3AF; }
-        div[data-testid="stMetricValue"] { color: #FFFFFF; font-weight: 700; }
-
-        /* TABS DESIGN */
-        .stTabs [data-baseweb="tab-list"] { gap: 10px; }
-        .stTabs [data-baseweb="tab"] {
-            height: 50px;
-            background-color: #1F252E;
-            border-radius: 8px 8px 0px 0px;
-            border: none;
-            color: #9CA3AF;
-        }
-        .stTabs [aria-selected="true"] {
-            background-color: #2F3642;
-            color: #4ADE80;
-            font-weight: bold;
-            border-bottom: 2px solid #4ADE80;
+        
+        /* --- SIDEBAR --- */
+        [data-testid="stSidebar"] { 
+            background-color: #0F1216; 
+            border-right: 1px solid #1F252E; 
         }
 
-        /* TABLE STYLING */
+        /* --- HEADERS --- */
+        .main-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(90deg, #4ADE80, #3B82F6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* HIDE DEFAULT STREAMLIT HEADER */
+        header {visibility: hidden;}
+        .block-container { padding-top: 2rem; padding-bottom: 3rem; }
+
+        /* --- TABLE STYLING --- */
+        td { font-size: 14px !important; padding: 12px !important; }
         thead tr th:first-child { display:none }
         tbody th { display:none }
-        td { font-size: 15px !important; font-family: 'Inter', monospace !important; }
-        
+
     </style>
 """, unsafe_allow_html=True)
 
-# 2. DATA LOADING
+# 3. DATA LOADING
 # ---------------------------------------------------------
 @st.cache_data
 def load_data():
-    df = pd.read_csv("eyeball_streamlit_final.csv")
+    df = pd.read_csv("Eyeball_Streamlit_Final.csv")
     df['Display_Name'] = df['Player'] + " (" + df['Season'].astype(str) + ") - " + df['Squad']
     return df
 
@@ -119,13 +134,12 @@ role_color_map = {
     "Commanding Center Back": "#F3F4F6"            # White
 }
 
-# 3. SIDEBAR (CONTROLS)
+# 4. SIDEBAR
 # ---------------------------------------------------------
 with st.sidebar:
-    st.markdown("<h1 style='color: #4ADE80; margin-bottom:0;'>EYEBALL</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #6B7280; font-size: 0.8rem;'>AI SCOUTING ANALYTICS</p>", unsafe_allow_html=True)
-    st.markdown("---")
-
+    st.markdown("<h2 style='color: #4ADE80; margin:0; font-weight:800; letter-spacing:-1px;'>EYEBALL.</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #6B7280; font-size: 0.8rem; margin-bottom: 20px;'>AI SCOUTING ANALYTICS</p>", unsafe_allow_html=True)
+    
     # Filters
     all_seasons = sorted(df['Season'].unique(), reverse=True)
     selected_seasons = st.multiselect("📅 Season", all_seasons, default=all_seasons[:1])
@@ -154,13 +168,13 @@ with st.sidebar:
     if selected_roles: final_df = final_df[final_df['Role_Name'].isin(selected_roles)]
     
     st.markdown("---")
-    st.info(f"📊 Players Loaded: **{len(final_df)}**")
+    st.caption(f"📊 Players Loaded: **{len(final_df)}**")
 
 
-# 4. MAIN LAYOUT
+# 5. MAIN LAYOUT
 # ---------------------------------------------------------
 st.markdown('<div class="main-title">Scouting Intelligence</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Advanced 3D clustering & head-to-head analysis platform.</div>', unsafe_allow_html=True)
+st.markdown('<p style="color:#9CA3AF; margin-bottom: 30px;">Advanced 3D clustering & head-to-head analysis platform.</p>', unsafe_allow_html=True)
 
 tab1, tab2 = st.tabs(["🌍 3D EXPLORATION", "⚔️ PLAYER COMPARISON"])
 
@@ -175,13 +189,11 @@ with tab1:
         if selected_player_search != "Select...":
             p_info = df[df['Display_Name'] == selected_player_search].iloc[0]
             st.markdown(f"""
-            <div style="background-color: #1F252E; padding: 15px; border-radius: 10px; border: 1px solid #2F3642; margin-top: 10px;">
-                <h3 style="color: #4ADE80; margin:0; font-size: 1.2rem;">{p_info['Player']}</h3>
+            <div style="background-color: #1F252E; padding: 20px; border-radius: 16px; border: 1px solid #2F3642; margin-top: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+                <h3 style="color: #4ADE80; margin:0; font-size: 1.4rem; font-weight: 700;">{p_info['Player']}</h3>
                 <p style="color: #9CA3AF; margin:0; font-size: 0.9rem;">{p_info['Squad']}</p>
-                <hr style="border-color: #2F3642;">
-                <div style="display: flex; justify-content: space-between;">
-                    <span style="color: #E0E0E0;">Goals: <b style="color: #FFFFFF;">{int(p_info.get('Goals', 0))}</b></span>
-                    <span style="color: #E0E0E0;">Assists: <b style="color: #FFFFFF;">{int(p_info.get('Assists', 0))}</b></span>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #2F3642;">
+                    <span style="color: #E0E0E0; font-size: 0.9rem;">Role: <br><b style="color: #FFFFFF;">{p_info['Role_Name']}</b></span>
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -207,7 +219,7 @@ with tab1:
             height=650,
             legend=dict(
                 x=0, y=1, 
-                font=dict(color="white", size=10),
+                font=dict(color="white", size=11, family="Inter"),
                 bgcolor="rgba(0,0,0,0.5)"
             )
         )
@@ -285,7 +297,7 @@ with tab2:
             fig_radar.update_layout(
                 polar=dict(
                     radialaxis=dict(visible=False),
-                    bgcolor='#1F252E'
+                    bgcolor='#151A21' # Radar background match
                 ),
                 paper_bgcolor='rgba(0,0,0,0)',
                 plot_bgcolor='rgba(0,0,0,0)',
@@ -318,7 +330,7 @@ with tab2:
             
             comp_df = pd.DataFrame(rows)
             
-            # Formatter Function
+            # Formatter
             def smart_format(x):
                 try:
                     if isinstance(x, (int, float)):
@@ -326,15 +338,14 @@ with tab2:
                     return x
                 except: return x
 
-            # Highlight Function
+            # Highlight
             def highlight(row):
                 c1, c2 = row.index[2], row.index[3]
                 v1, v2 = row[c1], row[c2]
                 styles = ['' for _ in row]
                 
-                # Neon Green for Winner, Dimmed Gray for Loser
-                win_css = 'color: #4ADE80; font-weight: 700; background-color: rgba(74, 222, 128, 0.1);'
-                lose_css = 'color: #6B7280; font-weight: 400; opacity: 0.7;'
+                win_css = 'color: #4ADE80; font-weight: 700; background-color: rgba(74, 222, 128, 0.05); border-radius: 6px;'
+                lose_css = 'color: #6B7280; font-weight: 400; opacity: 0.6;'
                 
                 try:
                     val1, val2 = float(v1), float(v2)
@@ -361,4 +372,3 @@ st.markdown("""
     UMAP & CA
 </div>
 """, unsafe_allow_html=True)
-
