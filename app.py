@@ -4,7 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
-# 1. SAYFA AYARLARI VE CSS (MODERN UI)
+# 1. PAGE CONFIGURATION & PREMIUM CSS
 # ---------------------------------------------------------
 st.set_page_config(
     page_title="Eyeball Scout",
@@ -13,119 +13,178 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ÖZEL CSS: UI Düzeltmeleri
+# CUSTOM CSS INJECTION (The UI Overhaul)
 st.markdown("""
     <style>
-        /* 1. Üstteki standart Streamlit çubuğunu gizle (Sorunu çıkaran dikdörtgen) */
+        /* IMPORT GOOGLE FONT 'INTER' */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        
+        /* GENERAL SETTINGS */
+        * { font-family: 'Inter', sans-serif; }
+        .stApp { background-color: #0B0E11; color: #E0E0E0; }
+        
+        /* HIDE DEFAULT HEADER & FOOTER */
         header {visibility: hidden;}
+        footer {visibility: hidden;}
         
-        /* 2. Ana içerik bloğunu aşağı it (Sekmelerin görünmesi için) */
-        .block-container {
-            padding-top: 2rem; /* 1rem az geliyordu, 2rem yaptık */
-            padding-bottom: 1rem;
+        /* ADJUST PADDING FOR HEADER VISIBILITY ISSUE */
+        .block-container { padding-top: 2rem; padding-bottom: 2rem; }
+
+        /* SIDEBAR STYLING */
+        [data-testid="stSidebar"] { background-color: #151A21; border-right: 1px solid #2A2F3A; }
+        
+        /* HEADERS */
+        h1, h2, h3 { font-weight: 700; color: #FFFFFF; }
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #4ADE80, #3B82F6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0px;
         }
-        
-        /* Ana font ayarları */
-        h1, h2, h3 { font-family: 'Helvetica Neue', sans-serif; font-weight: 700; }
-        
-        /* Kart Görünümü */
+        .sub-title { font-size: 1rem; color: #9CA3AF; margin-bottom: 20px; }
+
+        /* METRIC CARDS */
         div[data-testid="stMetric"] {
-            background-color: #262730;
-            border: 1px solid #464b5f;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
+            background-color: #1F252E;
+            border: 1px solid #2F3642;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
         }
-        
-        /* Tablo Başlıklarını Gizle (Daha temiz görünüm için) */
+        div[data-testid="stMetric"]:hover {
+            transform: translateY(-2px);
+            border-color: #4ADE80;
+        }
+        div[data-testid="stMetricLabel"] { color: #9CA3AF; }
+        div[data-testid="stMetricValue"] { color: #FFFFFF; font-weight: 700; }
+
+        /* TABS DESIGN */
+        .stTabs [data-baseweb="tab-list"] { gap: 10px; }
+        .stTabs [data-baseweb="tab"] {
+            height: 50px;
+            background-color: #1F252E;
+            border-radius: 8px 8px 0px 0px;
+            border: none;
+            color: #9CA3AF;
+        }
+        .stTabs [aria-selected="true"] {
+            background-color: #2F3642;
+            color: #4ADE80;
+            font-weight: bold;
+            border-bottom: 2px solid #4ADE80;
+        }
+
+        /* TABLE STYLING */
         thead tr th:first-child { display:none }
         tbody th { display:none }
+        td { font-size: 15px !important; font-family: 'Inter', monospace !important; }
         
-        /* Tablo Yazı Tipi */
-        td { font-size: 1.1em !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# 2. VERİ YÜKLEME
+# 2. DATA LOADING
 # ---------------------------------------------------------
 @st.cache_data
 def load_data():
-    df = pd.read_csv("eyeball_streamlit_final.csv")
+    df = pd.read_csv("Eyeball_Streamlit_Final.csv")
     df['Display_Name'] = df['Player'] + " (" + df['Season'].astype(str) + ") - " + df['Squad']
     return df
 
 try:
     df = load_data()
 except FileNotFoundError:
-    st.error("HATA: CSV dosyası bulunamadı.")
+    st.error("ERROR: CSV file not found.")
     st.stop()
 
-# RENK HARİTASI
+# HIGH CONTRAST COLOR MAP
 role_color_map = {
-    "Inverted Winger / Dribbler": "#FF0000",       
-    "Elite Speedster / Direct Winger": "#FF00FF",  
-    "Poacher / Penalty Box Striker": "#FFA500",    
-    "Versatile Forward / Second Striker": "#FFFF00", 
-    "Target Man / Aerial Threat": "#FF69B4",       
-    "Pressing Forward": "#00FF00",                 
-    "Technical Hub / Deep Playmaker": "#00FFFF",   
-    "Progressive Passer / Controller": "#1E90FF",  
-    "Physical Ball Carrier": "#9932CC",            
-    "Defensive Midfielder / Anchor": "#8B4513",    
-    "Wide Midfielder / Defensive Winger": "#7FFF00", 
-    "Utility Player / Workhorse": "#A9A9A9",       
-    "Deep Distributor / Ball Playing CB": "#008080", 
-    "Stopper / No-Nonsense Defender": "#800000",   
-    "Central Defender (Standard)": "#000080",      
-    "Commanding Center Back": "#FFFFFF"            
+    "Inverted Winger / Dribbler": "#EF4444",       # Red
+    "Elite Speedster / Direct Winger": "#EC4899",  # Pink
+    "Poacher / Penalty Box Striker": "#F97316",    # Orange
+    "Versatile Forward / Second Striker": "#EAB308", # Yellow
+    "Target Man / Aerial Threat": "#A855F7",       # Purple
+    "Pressing Forward": "#84CC16",                 # Lime
+    "Technical Hub / Deep Playmaker": "#06B6D4",   # Cyan
+    "Progressive Passer / Controller": "#3B82F6",  # Blue
+    "Physical Ball Carrier": "#6366F1",            # Indigo
+    "Defensive Midfielder / Anchor": "#78350F",    # Amber
+    "Wide Midfielder / Defensive Winger": "#10B981", # Emerald
+    "Utility Player / Workhorse": "#6B7280",       # Gray
+    "Deep Distributor / Ball Playing CB": "#14B8A6", # Teal
+    "Stopper / No-Nonsense Defender": "#991B1B",   # Dark Red
+    "Central Defender (Standard)": "#1E3A8A",      # Dark Blue
+    "Commanding Center Back": "#F3F4F6"            # White
 }
 
-# 3. YAN PANEL (SIDEBAR)
+# 3. SIDEBAR (CONTROLS)
 # ---------------------------------------------------------
-st.sidebar.title("Scouting Tab")
-st.sidebar.markdown("---")
+with st.sidebar:
+    st.markdown("<h1 style='color: #4ADE80; margin-bottom:0;'>EYEBALL</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #6B7280; font-size: 0.8rem;'>AI SCOUTING ANALYTICS</p>", unsafe_allow_html=True)
+    st.markdown("---")
 
-# A. Sezon
-all_seasons = sorted(df['Season'].unique(), reverse=True)
-selected_seasons = st.sidebar.multiselect("Season", all_seasons, default=all_seasons[:1])
+    # Filters
+    all_seasons = sorted(df['Season'].unique(), reverse=True)
+    selected_seasons = st.multiselect("📅 Season", all_seasons, default=all_seasons[:1])
 
-if selected_seasons:
-    df_filtered_season = df[df['Season'].isin(selected_seasons)]
-else:
-    df_filtered_season = df.copy()
+    if selected_seasons:
+        df_filtered_season = df[df['Season'].isin(selected_seasons)]
+    else:
+        df_filtered_season = df.copy()
 
-# B. Takım
-teams = sorted(df_filtered_season['Squad'].unique())
-selected_teams = st.sidebar.multiselect("Squad", teams)
+    teams = sorted(df_filtered_season['Squad'].unique())
+    selected_teams = st.multiselect("🛡️ Squad", teams)
 
-# C. Mevki (Bölge yerine)
-positions = sorted(df_filtered_season['General_Position'].unique())
-selected_pos = st.sidebar.multiselect("Position", positions)
+    positions = sorted(df_filtered_season['General_Position'].unique())
+    selected_pos = st.multiselect("📍 Position", positions)
 
-# D. Rol (Yapay Zeka Rolü yerine)
-if selected_pos:
-    roles = sorted(df_filtered_season[df_filtered_season['General_Position'].isin(selected_pos)]['Role_Name'].unique())
-else:
-    roles = sorted(df_filtered_season['Role_Name'].unique())
-selected_roles = st.sidebar.multiselect("Role", roles)
+    if selected_pos:
+        roles = sorted(df_filtered_season[df_filtered_season['General_Position'].isin(selected_pos)]['Role_Name'].unique())
+    else:
+        roles = sorted(df_filtered_season['Role_Name'].unique())
+    selected_roles = st.multiselect("🧠 Role", roles)
 
-# Filtreleme
-final_df = df_filtered_season.copy()
-if selected_teams: final_df = final_df[final_df['Squad'].isin(selected_teams)]
-if selected_pos: final_df = final_df[final_df['General_Position'].isin(selected_pos)]
-if selected_roles: final_df = final_df[final_df['Role_Name'].isin(selected_roles)]
+    # Apply Filters
+    final_df = df_filtered_season.copy()
+    if selected_teams: final_df = final_df[final_df['Squad'].isin(selected_teams)]
+    if selected_pos: final_df = final_df[final_df['General_Position'].isin(selected_pos)]
+    if selected_roles: final_df = final_df[final_df['Role_Name'].isin(selected_roles)]
+    
+    st.markdown("---")
+    st.info(f"📊 Players Loaded: **{len(final_df)}**")
 
 
-# 4. ANA EKRAN
+# 4. MAIN LAYOUT
 # ---------------------------------------------------------
-tab1, tab2 = st.tabs(["🌍 3D Exploration", "⚖️ Player Comparison"])
+st.markdown('<div class="main-title">Scouting Intelligence</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">Advanced 3D clustering & head-to-head analysis platform.</div>', unsafe_allow_html=True)
 
-# --- TAB 1: 3D KEŞİF ---
+tab1, tab2 = st.tabs(["🌍 3D EXPLORATION", "⚔️ PLAYER COMPARISON"])
+
+# --- TAB 1: 3D EXPLORATION ---
 with tab1:
     col_search, col_space = st.columns([1, 3])
     with col_search:
         search_list = ["Select..."] + sorted(final_df['Display_Name'].unique().tolist())
-        selected_player_search = st.selectbox("Zoom to the Player:", search_list)
+        selected_player_search = st.selectbox("Zoom to Player", search_list, label_visibility="collapsed")
+        
+        # Player Quick Info Card
+        if selected_player_search != "Select...":
+            p_info = df[df['Display_Name'] == selected_player_search].iloc[0]
+            st.markdown(f"""
+            <div style="background-color: #1F252E; padding: 15px; border-radius: 10px; border: 1px solid #2F3642; margin-top: 10px;">
+                <h3 style="color: #4ADE80; margin:0; font-size: 1.2rem;">{p_info['Player']}</h3>
+                <p style="color: #9CA3AF; margin:0; font-size: 0.9rem;">{p_info['Squad']}</p>
+                <hr style="border-color: #2F3642;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: #E0E0E0;">Goals: <b style="color: #FFFFFF;">{int(p_info.get('Goals', 0))}</b></span>
+                    <span style="color: #E0E0E0;">Assists: <b style="color: #FFFFFF;">{int(p_info.get('Assists', 0))}</b></span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
     if not final_df.empty:
         fig = px.scatter_3d(
@@ -133,192 +192,172 @@ with tab1:
             color='Role_Name', color_discrete_map=role_color_map,
             hover_name='Display_Name',
             hover_data=['Age', 'Goals', 'Assists', 'Minutes'],
-            opacity=0.8, size_max=12, template='plotly_dark',
-            title=f"Player Pool: {len(final_df)}"
+            opacity=0.8, size_max=14, 
+            title=""
         )
+        # Clean Plotly Layout
         fig.update_layout(
-            scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor='rgba(0,0,0,0)'),
-            margin=dict(l=0, r=0, b=0, t=30), height=600,
-            legend=dict(x=0, y=1, font=dict(size=10))
+            scene=dict(
+                xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False),
+                bgcolor='rgba(0,0,0,0)'
+            ),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            margin=dict(l=0, r=0, b=0, t=0),
+            height=650,
+            legend=dict(
+                x=0, y=1, 
+                font=dict(color="white", size=10),
+                bgcolor="rgba(0,0,0,0.5)"
+            )
         )
+        
         if selected_player_search != "Select...":
             p_data = df[df['Display_Name'] == selected_player_search]
             if not p_data.empty:
                 fig.add_trace(go.Scatter3d(
                     x=p_data['x'], y=p_data['y'], z=p_data['z'],
-                    mode='markers', marker=dict(size=25, color='white', symbol='diamond', line=dict(width=2, color='black')),
+                    mode='markers', 
+                    marker=dict(size=30, color='#4ADE80', symbol='diamond', line=dict(width=3, color='white')),
                     name='SELECTED', hoverinfo='text', hovertext=selected_player_search
                 ))
-        st.plotly_chart(fig, use_container_width=True)
         
-        # CSV İndirme Butonu (İsteğe Bağlı)
-        with st.expander("📥 Download CSV"):
-            st.download_button(
-                label="Download Filtered Data as CSV",
-                data=final_df.to_csv(index=False).encode('utf-8'),
-                file_name='filtered_data.csv',
-                mime='text/csv'
-            )
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning("No players found with current filters.")
 
-# --- TAB 2: KARŞILAŞTIRMA (GELİŞMİŞ) ---
+# --- TAB 2: PLAYER COMPARISON ---
 with tab2:
-    st.markdown("### ⚔️ Player Comparison")
+    col_sel1, col_sel2 = st.columns(2)
     
-    all_players_list = sorted(df['Display_Name'].unique().tolist())
-    c1, c2 = st.columns(2)
-    with c1:
-        p1_name = st.selectbox("1st Player", all_players_list, index=0)
-    with c2:
-        p2_name = st.selectbox("2nd Player", all_players_list, index=min(10, len(all_players_list)-1))
+    all_players = sorted(df['Display_Name'].unique().tolist())
+    
+    with col_sel1:
+        p1_name = st.selectbox("1st Player", all_players, index=0)
+    with col_sel2:
+        p2_name = st.selectbox("2nd Player", all_players, index=min(10, len(all_players)-1))
 
     if p1_name and p2_name:
         p1 = df[df['Display_Name'] == p1_name].iloc[0]
         p2 = df[df['Display_Name'] == p2_name].iloc[0]
-
-        # 1. KARTLAR
-        col1, col2 = st.columns(2)
-        with col1:
-            st.success(f"🔵 {p1['Player']}")
-            st.caption(f"{p1['Squad']} | {p1['Season']}")
-            st.metric("Role", p1['Role_Name'])
-        with col2:
-            st.error(f"🔴 {p2['Player']}")
-            st.caption(f"{p2['Squad']} | {p2['Season']}")
-            st.metric("Role", p2['Role_Name'])
         
         st.markdown("---")
 
-        # 2. RADAR GRAFİĞİ (NORMALİZE EDİLMİŞ)
-        # Sorunu çözen kısım burası: Verileri 0-1 arasına sıkıştırıyoruz.
-        radar_metrics = ['Goals', 'Assists', 'Shots', 'SoT', 'Dribbles_Succ', 'Prg_Pass_Dist', 'Tackles', 'Interceptions', 'Blocks']
-        
-        # Verileri çek
-        vals1 = [p1.get(m, 0) for m in radar_metrics]
-        vals2 = [p2.get(m, 0) for m in radar_metrics]
-        
-        # Normalizasyon (Ölçekleme)
-        # İki oyuncunun maksimum değerine göre oranlıyoruz.
-        # Böylece 5 Gol de, 500 Pas da grafikte düzgün görünür.
-        normalized_vals1 = []
-        normalized_vals2 = []
-        
-        for v1, v2 in zip(vals1, vals2):
-            max_val = max(v1, v2)
-            if max_val == 0: max_val = 1 # Sıfıra bölünme hatasını önle
-            normalized_vals1.append(v1 / max_val)
-            normalized_vals2.append(v2 / max_val)
+        # 1. INFO CARDS
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Player 1", p1['Player'], f"{int(p1['Age'])} yo")
+        c2.metric("Team", p1['Squad'], p1['Season'])
+        c3.metric("Player 2", p2['Player'], f"{int(p2['Age'])} yo")
+        c4.metric("Team", p2['Squad'], p2['Season'])
 
-        fig_radar = go.Figure()
-        
-        # Oyuncu 1
-        fig_radar.add_trace(go.Scatterpolar(
-            r=normalized_vals1, # Çizim için normalize değer
-            theta=radar_metrics,
-            fill='toself',
-            name=p1['Player'],
-            text=vals1, # Üzerine gelince GERÇEK değer yazsın
-            hoverinfo="text+theta+name",
-            line_color='#00CC96' # Yeşilimsi
-        ))
-        
-        # Oyuncu 2
-        fig_radar.add_trace(go.Scatterpolar(
-            r=normalized_vals2,
-            theta=radar_metrics,
-            fill='toself',
-            name=p2['Player'],
-            text=vals2,
-            hoverinfo="text+theta+name",
-            line_color='#EF553B' # Kırmızımsı
-        ))
-        
-        fig_radar.update_layout(
-            polar=dict(radialaxis=dict(visible=False)), # Eksen sayılarını gizle (kafa karıştırmasın)
-            showlegend=True,
-            title="Statistics Radar",
-            height=450,
-            template="plotly_dark",
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)'
-        )
-        st.plotly_chart(fig_radar, use_container_width=True)
+        st.markdown("<br>", unsafe_allow_html=True)
 
-        # 3. GELİŞMİŞ TABLO (Kazananı Vurgulama)
-        st.subheader("Statistics Comparison")
+        # 2. RADAR & TABLE
+        col_radar, col_table = st.columns([2, 3])
         
-        compare_metrics = {
-            'Attacking': ['Goals', 'Assists', 'Shots', 'SoT', 'npxG_p90', 'xA_p90'],
-            'Playmaking': ['Prg_Pass_Dist', 'Prg_Carry_Dist', 'GCA', 'SCA', 'Pass_Cmp_Pct'],
-            'Defencing': ['Tackles', 'Interceptions', 'Blocks'],
-            'General': ['Minutes', 'Age', 'Role_Probability']
-        }
-        
-        # Pandas Styler kullanarak tabloyu boyuyoruz
-        rows = []
-        for category, metrics in compare_metrics.items():
-            for m in metrics:
-                val1 = p1.get(m, 0)
-                val2 = p2.get(m, 0)
-                
-                # Kazananı belirle
-                diff = val1 - val2
-                
-                rows.append({
-                    "Category": category,
-                    "Metric": m,
-                    f"{p1['Player']}": val1,
-                    f"{p2['Player']}": val2,
-                })
-        
-        comp_df = pd.DataFrame(rows)
-
-        def smart_format(x):
-            try:
-                if isinstance(x, (int, float)):
-                    if x % 1 == 0:
-                        return f"{x:.0f}"
-                    else:
-                        return f"{x:.2f}"
-                return x
-            except:
-                return x
-        
-# RENKLENDİRME FONKSİYONU (Girinti hatası olmaması için buraya aldık)
-        def highlight_winner(row):
-            col1_name, col2_name = row.index[2], row.index[3]
-            v1, v2 = row[col1_name], row[col2_name]
-            styles = ['' for _ in row]
+        with col_radar:
+            st.markdown("##### ⚡ Skill Profile (Relative)")
+            radar_metrics = ['Goals', 'Assists', 'Shots', 'SoT', 'Dribbles_Succ', 'Prg_Pass_Dist', 'Tackles', 'Interceptions', 'Blocks']
             
-            winner_style = 'color: #00FF7F; font-weight: 900; text-shadow: 0 0 5px rgba(0,255,127,0.5); font-size: 1.1em;'
-            loser_style = 'color: #666; font-weight: normal; opacity: 0.5;'
-            draw_style = 'color: white;'
+            # Normalization
+            v1_raw = [p1.get(m, 0) for m in radar_metrics]
+            v2_raw = [p2.get(m, 0) for m in radar_metrics]
+            v1_norm, v2_norm = [], []
+            
+            for val1, val2 in zip(v1_raw, v2_raw):
+                mx = max(val1, val2)
+                if mx == 0: mx = 1
+                v1_norm.append(val1/mx)
+                v2_norm.append(val2/mx)
+                
+            fig_radar = go.Figure()
+            fig_radar.add_trace(go.Scatterpolar(
+                r=v1_norm, theta=radar_metrics, fill='toself', name=p1['Player'],
+                text=v1_raw, hoverinfo="text+theta+name", 
+                line_color='#4ADE80', fillcolor='rgba(74, 222, 128, 0.2)'
+            ))
+            fig_radar.add_trace(go.Scatterpolar(
+                r=v2_norm, theta=radar_metrics, fill='toself', name=p2['Player'],
+                text=v2_raw, hoverinfo="text+theta+name", 
+                line_color='#3B82F6', fillcolor='rgba(59, 130, 246, 0.2)'
+            ))
+            
+            fig_radar.update_layout(
+                polar=dict(
+                    radialaxis=dict(visible=False),
+                    bgcolor='#1F252E'
+                ),
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                margin=dict(t=20, b=20, l=20, r=20),
+                height=400,
+                showlegend=True,
+                legend=dict(font=dict(color="white"), orientation="h")
+            )
+            st.plotly_chart(fig_radar, use_container_width=True)
 
-            try:
-                val1, val2 = float(v1), float(v2)
-                if val1 > val2:
-                    styles[2], styles[3] = winner_style, loser_style
-                elif val2 > val1:
-                    styles[2], styles[3] = loser_style, winner_style
-                else:
-                    styles[2], styles[3] = draw_style, draw_style
-            except: pass
-            return styles
+        with col_table:
+            st.markdown("##### 📋 Detailed Comparison")
+            
+            # Data Preparation
+            compare_metrics = {
+                'Attacking': ['Goals', 'Assists', 'Shots', 'SoT', 'npxG_p90', 'xA_p90'],
+                'Playmaking': ['Prg_Pass_Dist', 'Prg_Carry_Dist', 'GCA', 'SCA', 'Pass_Cmp_Pct'],
+                'Defencing': ['Tackles', 'Interceptions', 'Blocks'],
+                'General': ['Minutes', 'Age', 'Role_Probability']
+            }
+            
+            rows = []
+            for cat, metrics in compare_metrics.items():
+                for m in metrics:
+                    rows.append({
+                        "Category": cat, "Metric": m,
+                        f"{p1['Player']}": p1.get(m, 0),
+                        f"{p2['Player']}": p2.get(m, 0)
+                    })
+            
+            comp_df = pd.DataFrame(rows)
+            
+            # Formatter Function
+            def smart_format(x):
+                try:
+                    if isinstance(x, (int, float)):
+                        return f"{x:.0f}" if x % 1 == 0 else f"{x:.2f}"
+                    return x
+                except: return x
 
-        st.dataframe(
-            comp_df.style
-            .apply(highlight_winner, axis=1)
-            .format(smart_format, subset=comp_df.columns[2:]),
-            use_container_width=True, height=600, hide_index=True
-        )
+            # Highlight Function
+            def highlight(row):
+                c1, c2 = row.index[2], row.index[3]
+                v1, v2 = row[c1], row[c2]
+                styles = ['' for _ in row]
+                
+                # Neon Green for Winner, Dimmed Gray for Loser
+                win_css = 'color: #4ADE80; font-weight: 700; background-color: rgba(74, 222, 128, 0.1);'
+                lose_css = 'color: #6B7280; font-weight: 400; opacity: 0.7;'
+                
+                try:
+                    val1, val2 = float(v1), float(v2)
+                    if val1 > val2:
+                        styles[2], styles[3] = win_css, lose_css
+                    elif val2 > val1:
+                        styles[2], styles[3] = lose_css, win_css
+                except: pass
+                return styles
 
-# ALTLIK
+            st.dataframe(
+                comp_df.style.apply(highlight, axis=1).format(smart_format, subset=comp_df.columns[2:]),
+                use_container_width=True,
+                height=500,
+                hide_index=True
+            )
+
+# FOOTER
 st.markdown("---")
 st.markdown("""
-<div style="text-align: center; color: grey;">
+<div style="text-align: center; color: #6B7280; font-size: 0.9rem;">
     Eyeball Scout | 
-    <span style="color: #4ade80;">Position & Role Analysis</span> | 
+    <span style="color: #4ADE80;">Position & Role Analysis</span> | 
     UMAP & CA
 </div>
 """, unsafe_allow_html=True)
-
-
