@@ -10,28 +10,18 @@ st.set_page_config(
     page_title="Eyeball Scout | Pro Analytics",
     page_icon="⚽",
     layout="wide",
-    initial_sidebar_state="collapsed" # Yan paneli kapalı başlatıyoruz, odak ana ekranda
+    initial_sidebar_state="collapsed"
 )
 
-# 2. ULTRA PREMIUM CSS (GRADIENT & GLASSMORPHISM)
+# 2. ULTRA PREMIUM CSS
 # ---------------------------------------------------------
 st.markdown("""
     <style>
-        /* IMPORT FONT */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        
-        /* GLOBAL RESET */
         * { font-family: 'Inter', sans-serif !important; }
         .stApp { background-color: #050505; color: #ffffff; }
 
         /* GRADIENT TEXT */
-        .gradient-text {
-            font-weight: 800;
-            background: -webkit-linear-gradient(45deg, #00FFA3, #00D2FF);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
         h1, h2, h3 {
             font-weight: 800 !important;
             background: -webkit-linear-gradient(45deg, #4ADE80, #3B82F6);
@@ -40,7 +30,7 @@ st.markdown("""
             letter-spacing: -0.5px;
         }
 
-        /* INPUT KUTULARI (Filtreler için) */
+        /* INPUT FIELDS */
         .stSelectbox div[data-baseweb="select"] > div,
         .stMultiSelect div[data-baseweb="select"] > div {
             background-color: #111111 !important;
@@ -48,12 +38,7 @@ st.markdown("""
             border-radius: 12px !important;
             color: white !important;
         }
-        
-        /* Dropdown Menü */
-        ul[data-baseweb="menu"] {
-            background-color: #000 !important;
-            border: 1px solid #333 !important;
-        }
+        ul[data-baseweb="menu"] { background-color: #000 !important; border: 1px solid #333 !important; }
 
         /* METRIC CARDS */
         div[data-testid="stMetric"] {
@@ -64,43 +49,19 @@ st.markdown("""
             padding: 15px;
             text-align: center;
         }
-        div[data-testid="stMetricValue"] {
-            color: #00FFA3 !important;
-            font-weight: 800;
-            font-size: 24px !important;
-        }
+        div[data-testid="stMetricValue"] { color: #00FFA3 !important; font-weight: 800; font-size: 24px !important; }
         div[data-testid="stMetricLabel"] { color: #888; font-size: 13px; }
 
         /* TABS */
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 20px;
-            background-color: transparent;
-            border-bottom: 1px solid #333;
-            margin-bottom: 20px;
-        }
-        .stTabs [data-baseweb="tab"] {
-            height: 50px;
-            background-color: transparent;
-            border: none;
-            color: #666;
-            font-size: 16px;
-            font-weight: 600;
-        }
-        .stTabs [aria-selected="true"] {
-            background-color: transparent;
-            color: #00FFA3 !important;
-            border-bottom: 3px solid #00FFA3;
-        }
+        .stTabs [data-baseweb="tab-list"] { gap: 20px; background-color: transparent; border-bottom: 1px solid #333; margin-bottom: 20px; }
+        .stTabs [data-baseweb="tab"] { height: 50px; background-color: transparent; border: none; color: #666; font-size: 16px; font-weight: 600; }
+        .stTabs [aria-selected="true"] { background-color: transparent; color: #00FFA3 !important; border-bottom: 3px solid #00FFA3; }
 
         /* SIDEBAR */
-        [data-testid="stSidebar"] { 
-            background-color: #000000; 
-            border-right: 1px solid #222; 
-        }
+        [data-testid="stSidebar"] { background-color: #000000; border-right: 1px solid #222; }
         
         header {visibility: hidden;}
         .block-container { padding-top: 2rem; }
-        
         td { font-size: 14px !important; color: #ddd !important; border-bottom: 1px solid #222 !important; }
 
     </style>
@@ -122,73 +83,58 @@ except FileNotFoundError:
 
 # COLOR MAP
 role_color_map = {
-    "Inverted Winger / Dribbler": "#FF2A6D",       
-    "Elite Speedster / Direct Winger": "#D300C5",  
-    "Poacher / Penalty Box Striker": "#FF9600",    
-    "Versatile Forward / Second Striker": "#F5D300", 
-    "Target Man / Aerial Threat": "#B800F5",       
-    "Pressing Forward": "#00F562",                 
-    "Technical Hub / Deep Playmaker": "#05D9E8",   
-    "Progressive Passer / Controller": "#0056F5",  
-    "Physical Ball Carrier": "#6500F5",            
-    "Defensive Midfielder / Anchor": "#8F4300",    
-    "Wide Midfielder / Defensive Winger": "#00F5A0", 
-    "Utility Player / Workhorse": "#777777",       
-    "Deep Distributor / Ball Playing CB": "#00E0C6", 
-    "Stopper / No-Nonsense Defender": "#8F001A",   
-    "Central Defender (Standard)": "#00188F",      
-    "Commanding Center Back": "#FFFFFF"            
+    "Inverted Winger / Dribbler": "#FF2A6D", "Elite Speedster / Direct Winger": "#D300C5",
+    "Poacher / Penalty Box Striker": "#FF9600", "Versatile Forward / Second Striker": "#F5D300",
+    "Target Man / Aerial Threat": "#B800F5", "Pressing Forward": "#00F562",
+    "Technical Hub / Deep Playmaker": "#05D9E8", "Progressive Passer / Controller": "#0056F5",
+    "Physical Ball Carrier": "#6500F5", "Defensive Midfielder / Anchor": "#8F4300",
+    "Wide Midfielder / Defensive Winger": "#00F5A0", "Utility Player / Workhorse": "#777777",
+    "Deep Distributor / Ball Playing CB": "#00E0C6", "Stopper / No-Nonsense Defender": "#8F001A",
+    "Central Defender (Standard)": "#00188F", "Commanding Center Back": "#FFFFFF"
 }
 
-# 4. SIDEBAR (SADECE LOGO)
+# 4. SIDEBAR (LOGO)
 # ---------------------------------------------------------
 with st.sidebar:
     st.markdown("<h1 style='font-size: 3rem; margin-bottom: 0;'>EYEBALL<span style='color:#00FFA3'>.</span></h1>", unsafe_allow_html=True)
     st.markdown("<p style='color: #666; font-size: 0.9rem; margin-top: -10px;'>AI SCOUTING ANALYTICS</p>", unsafe_allow_html=True)
-    st.info("ℹ️ Filters are now located above the 3D map for easier access.")
 
 # 5. MAIN LAYOUT
 # ---------------------------------------------------------
 st.markdown('<h1 style="font-size: 3rem; margin-bottom: 0;">SCOUTING INTELLIGENCE</h1>', unsafe_allow_html=True)
-st.markdown('<p style="color:#888; margin-bottom: 30px; font-size: 1.1rem;">Next-generation 3D clustering & performance analysis.</p>', unsafe_allow_html=True)
+st.markdown('<p style="color:#888; margin-bottom: 30px; font-size: 1.1rem;">Next-generation 3D clustering & performance analysis suite.</p>', unsafe_allow_html=True)
 
-tab1, tab2 = st.tabs(["🌍 3D EXPLORATION & FILTERS", "⚔️ PLAYER COMPARISON"])
+# SEKME YAPISI (4 SEKME)
+tab1, tab2, tab3, tab4 = st.tabs([
+    "🌍 3D EXPLORATION", 
+    "⚔️ PLAYER COMPARISON", 
+    "🏆 ROLE RANKING", 
+    "🧬 SIMILARITY SEARCH"
+])
 
-# --- TAB 1: 3D EXPLORATION (FILTERS MOVED HERE) ---
+# =============================================================================
+# TAB 1: 3D EXPLORATION (FILTERS)
+# =============================================================================
 with tab1:
-    
-    # --- A. CONTROL CENTER (Filtreler Buraya Taşındı) ---
     st.markdown("### 🎛️ DATA CONTROLS")
-    
-    # 4 Sütunlu Filtre Yapısı
     c1, c2, c3, c4 = st.columns(4)
     
-    # 1. Sezon
     all_seasons = sorted(df['Season'].unique(), reverse=True)
     selected_seasons = c1.multiselect("📅 SEASON", all_seasons, default=all_seasons[:1])
     
-    # Veriyi Sezona Göre Daralt
-    if selected_seasons:
-        df_season = df[df['Season'].isin(selected_seasons)]
-    else:
-        df_season = df.copy() # Seçim yoksa hepsi
+    if selected_seasons: df_season = df[df['Season'].isin(selected_seasons)]
+    else: df_season = df.copy()
         
-    # 2. Takım
     teams = sorted(df_season['Squad'].unique())
     selected_teams = c2.multiselect("🛡️ SQUAD", teams)
     
-    # 3. Mevki
     positions = sorted(df_season['General_Position'].unique())
     selected_pos = c3.multiselect("📍 POSITION", positions)
     
-    # 4. Rol (Dinamik)
-    if selected_pos:
-        roles = sorted(df_season[df_season['General_Position'].isin(selected_pos)]['Role_Name'].unique())
-    else:
-        roles = sorted(df_season['Role_Name'].unique())
+    if selected_pos: roles = sorted(df_season[df_season['General_Position'].isin(selected_pos)]['Role_Name'].unique())
+    else: roles = sorted(df_season['Role_Name'].unique())
     selected_roles = c4.multiselect("🧠 ROLE", roles)
 
-    # --- FİLTRE MOTORU ---
     final_df = df_season.copy()
     if selected_teams: final_df = final_df[final_df['Squad'].isin(selected_teams)]
     if selected_pos: final_df = final_df[final_df['General_Position'].isin(selected_pos)]
@@ -196,15 +142,11 @@ with tab1:
 
     st.markdown("---")
 
-    # --- B. 3D VISUALIZATION ---
     col_search, col_stats = st.columns([1, 4])
-    
     with col_search:
-        # Arama kutusu sadece filtrelenen oyuncuları gösterir
         search_list = ["Select..."] + sorted(final_df['Display_Name'].unique().tolist())
         selected_player_search = st.selectbox("ZOOM TO PLAYER", search_list)
         
-        # Filtre Sonucu Bilgi Kartı
         st.markdown(f"""
         <div style="background-color: #111; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-top: 20px;">
             <span style="color: #888; font-size: 0.8rem;">ACTIVE PLAYERS</span><br>
@@ -212,67 +154,40 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
 
-        if selected_player_search != "Select...":
-            p_info = df[df['Display_Name'] == selected_player_search].iloc[0]
-            st.markdown(f"""
-            <div style="background-color: #111; padding: 20px; border-radius: 12px; border: 1px solid #333; margin-top: 10px;">
-                <h3 style="margin:0; font-size: 1.2rem;">{p_info['Player']}</h3>
-                <p style="color: #666; margin:0;">{p_info['Squad']}</p>
-                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #333;">
-                    <span style="color: #888;">AI Role: <b style="color: #fff;">{p_info['Role_Name']}</b></span>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
     with col_stats:
         if not final_df.empty:
             fig = px.scatter_3d(
                 final_df, x='x', y='y', z='z',
                 color='Role_Name', color_discrete_map=role_color_map,
-                hover_name='Display_Name',
-                hover_data=['Age', 'Goals', 'Assists', 'Minutes'],
-                opacity=0.9, size_max=15, 
-                title=""
+                hover_name='Display_Name', hover_data=['Age', 'Goals', 'Assists'],
+                opacity=0.9, size_max=15, title=""
             )
             fig.update_layout(
-                scene=dict(
-                    xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False),
-                    bgcolor='rgba(0,0,0,0)'
-                ),
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                margin=dict(l=0, r=0, b=0, t=0),
-                height=600,
-                legend=dict(
-                    x=0, y=1, 
-                    font=dict(color="#aaa", size=10),
-                    bgcolor="rgba(0,0,0,0.5)"
-                )
+                scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor='rgba(0,0,0,0)'),
+                paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+                margin=dict(l=0, r=0, b=0, t=0), height=600,
+                legend=dict(x=0, y=1, font=dict(color="#aaa", size=10), bgcolor="rgba(0,0,0,0.5)")
             )
-            
             if selected_player_search != "Select...":
                 p_data = df[df['Display_Name'] == selected_player_search]
                 if not p_data.empty:
                     fig.add_trace(go.Scatter3d(
                         x=p_data['x'], y=p_data['y'], z=p_data['z'],
-                        mode='markers', 
-                        marker=dict(size=35, color='#00FFA3', symbol='diamond', line=dict(width=3, color='white')),
+                        mode='markers', marker=dict(size=35, color='#00FFA3', symbol='diamond', line=dict(width=3, color='white')),
                         name='SELECTED', hoverinfo='text', hovertext=selected_player_search
                     ))
-            
             st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.warning("No players match the selected filters.")
+        else: st.warning("No players match.")
 
-# --- TAB 2: PLAYER COMPARISON (UNCHANGED LOGIC) ---
+# =============================================================================
+# TAB 2: PLAYER COMPARISON (WITH 3D & IMPROVED RADAR)
+# =============================================================================
 with tab2:
     col_sel1, col_sel2 = st.columns(2)
     all_players = sorted(df['Display_Name'].unique().tolist())
     
-    with col_sel1:
-        p1_name = st.selectbox("PLAYER 1", all_players, index=0)
-    with col_sel2:
-        p2_name = st.selectbox("PLAYER 2", all_players, index=min(10, len(all_players)-1))
+    with col_sel1: p1_name = st.selectbox("PLAYER 1", all_players, index=0)
+    with col_sel2: p2_name = st.selectbox("PLAYER 2", all_players, index=min(10, len(all_players)-1))
 
     if p1_name and p2_name:
         p1 = df[df['Display_Name'] == p1_name].iloc[0]
@@ -280,24 +195,72 @@ with tab2:
         
         st.markdown("---")
 
+        # 1. INFO CARDS
         c1, c2, c3, c4 = st.columns(4)
-        c1.metric("PLAYER 1", p1['Player'], f"{int(p1['Age'])}")
+        c1.metric("PLAYER 1", p1['Player'], f"{p1['Role_Name']}")
         c2.metric("TEAM", p1['Squad'], p1['Season'])
-        c3.metric("PLAYER 2", p2['Player'], f"{int(p2['Age'])}")
+        c3.metric("PLAYER 2", p2['Player'], f"{p2['Role_Name']}")
         c4.metric("TEAM", p2['Squad'], p2['Season'])
 
+        # 2. 3D DISTANCE VISUALIZATION
         st.markdown("<br>", unsafe_allow_html=True)
-
-        col_radar, col_table = st.columns([2, 3])
+        col_3d, col_radar = st.columns([1, 1])
         
+        with col_3d:
+            st.markdown("##### 📏 3D PROXIMITY")
+            ignore_others = st.checkbox("Ignore Others (Focus Mode)", value=False)
+            
+            # Mesafeyi Hesapla (Euclidean)
+            dist = np.linalg.norm(np.array([p1['x'], p1['y'], p1['z']]) - np.array([p2['x'], p2['y'], p2['z']]))
+            similarity_score = max(0, 100 - (dist * 5)) # Basit bir benzerlik skoru algoritması
+            
+            st.caption(f"Spatial Distance: {dist:.2f} | Similarity Score: %{similarity_score:.1f}")
+
+            # 3D Grafik Çizimi
+            fig_comp = go.Figure()
+
+            # Arkadaki kalabalık
+            if not ignore_others:
+                fig_comp.add_trace(go.Scatter3d(
+                    x=df['x'], y=df['y'], z=df['z'],
+                    mode='markers', marker=dict(size=3, color='#333', opacity=0.3),
+                    hoverinfo='skip', name='Others'
+                ))
+            
+            # Oyuncu 1
+            fig_comp.add_trace(go.Scatter3d(
+                x=[p1['x']], y=[p1['y']], z=[p1['z']],
+                mode='markers+text', marker=dict(size=20, color='#00FFA3'),
+                name=p1['Player'], text=[p1['Player']], textposition="top center"
+            ))
+            
+            # Oyuncu 2
+            fig_comp.add_trace(go.Scatter3d(
+                x=[p2['x']], y=[p2['y']], z=[p2['z']],
+                mode='markers+text', marker=dict(size=20, color='#00D2FF'),
+                name=p2['Player'], text=[p2['Player']], textposition="top center"
+            ))
+            
+            # Çizgi çek
+            fig_comp.add_trace(go.Scatter3d(
+                x=[p1['x'], p2['x']], y=[p1['y'], p2['y']], z=[p1['z'], p2['z']],
+                mode='lines', line=dict(color='white', width=2, dash='dash'),
+                name='Distance'
+            ))
+
+            fig_comp.update_layout(
+                scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor='rgba(0,0,0,0)'),
+                paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=0, r=0, b=0, t=0), height=400, showlegend=False
+            )
+            st.plotly_chart(fig_comp, use_container_width=True)
+
         with col_radar:
-            st.markdown("<h3>SKILL RADAR</h3>", unsafe_allow_html=True)
+            st.markdown("##### ⚡ SKILL OVERLAP")
             radar_metrics = ['Goals', 'Assists', 'Shots', 'SoT', 'Dribbles_Succ', 'Prg_Pass_Dist', 'Tackles', 'Interceptions', 'Blocks']
             
             v1_raw = [p1.get(m, 0) for m in radar_metrics]
             v2_raw = [p2.get(m, 0) for m in radar_metrics]
             v1_norm, v2_norm = [], []
-            
             for val1, val2 in zip(v1_raw, v2_raw):
                 mx = max(val1, val2)
                 if mx == 0: mx = 1
@@ -305,66 +268,155 @@ with tab2:
                 v2_norm.append(val2/mx)
                 
             fig_radar = go.Figure()
+            # Şeffaflık (Opacity) ayarlandı ve çizgi modu eklendi
             fig_radar.add_trace(go.Scatterpolar(
                 r=v1_norm, theta=radar_metrics, fill='toself', name=p1['Player'],
                 text=v1_raw, hoverinfo="text+theta+name", 
-                line_color='#00FFA3', fillcolor='rgba(0, 255, 163, 0.1)'
+                line=dict(color='#00FFA3', width=3), fillcolor='rgba(0, 255, 163, 0.1)'
             ))
             fig_radar.add_trace(go.Scatterpolar(
                 r=v2_norm, theta=radar_metrics, fill='toself', name=p2['Player'],
                 text=v2_raw, hoverinfo="text+theta+name", 
-                line_color='#00D2FF', fillcolor='rgba(0, 210, 255, 0.1)'
+                line=dict(color='#00D2FF', width=3), fillcolor='rgba(0, 210, 255, 0.1)'
             ))
             
             fig_radar.update_layout(
-                polar=dict(radialaxis=dict(visible=False), bgcolor='#090909'),
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                margin=dict(t=20, b=20, l=20, r=20),
-                height=400,
-                showlegend=True,
-                legend=dict(font=dict(color="white"), orientation="h")
+                polar=dict(radialaxis=dict(visible=False), bgcolor='#111'),
+                paper_bgcolor='rgba(0,0,0,0)', margin=dict(t=30, b=30, l=30, r=30), height=400,
+                showlegend=True, legend=dict(font=dict(color="white"), orientation="h")
             )
             st.plotly_chart(fig_radar, use_container_width=True)
 
-        with col_table:
-            st.markdown("<h3>STATS MATRIX</h3>", unsafe_allow_html=True)
-            compare_metrics = {
-                'ATTACK': ['Goals', 'Assists', 'Shots', 'SoT', 'npxG_p90', 'xA_p90'],
-                'PLAYMAKING': ['Prg_Pass_Dist', 'Prg_Carry_Dist', 'GCA', 'SCA', 'Pass_Cmp_Pct'],
-                'DEFENSE': ['Tackles', 'Interceptions', 'Blocks'],
-                'INFO': ['Minutes', 'Age', 'Role_Probability']
-            }
-            rows = []
-            for cat, metrics in compare_metrics.items():
-                for m in metrics:
-                    rows.append({
-                        "Category": cat, "Metric": m,
-                        f"{p1['Player']}": p1.get(m, 0),
-                        f"{p2['Player']}": p2.get(m, 0)
-                    })
-            comp_df = pd.DataFrame(rows)
-            
-            def smart_format(x):
-                try: return f"{x:.0f}" if isinstance(x, (int, float)) and x % 1 == 0 else f"{x:.2f}"
-                except: return x
+        # 3. STATS MATRIX (UNCHANGED)
+        st.markdown("##### 📋 DETAILED STATS")
+        compare_metrics = {
+            'ATTACK': ['Goals', 'Assists', 'Shots', 'SoT', 'npxG_p90', 'xA_p90'],
+            'PLAYMAKING': ['Prg_Pass_Dist', 'Prg_Carry_Dist', 'GCA', 'SCA', 'Pass_Cmp_Pct'],
+            'DEFENSE': ['Tackles', 'Interceptions', 'Blocks'],
+            'INFO': ['Minutes', 'Age', 'Role_Probability']
+        }
+        rows = []
+        for cat, metrics in compare_metrics.items():
+            for m in metrics:
+                rows.append({"Category": cat, "Metric": m, f"{p1['Player']}": p1.get(m, 0), f"{p2['Player']}": p2.get(m, 0)})
+        comp_df = pd.DataFrame(rows)
+        
+        def smart_format(x):
+            try: return f"{x:.0f}" if isinstance(x, (int, float)) and x % 1 == 0 else f"{x:.2f}"
+            except: return x
 
-            def highlight(row):
-                c1, c2 = row.index[2], row.index[3]
-                v1, v2 = row[c1], row[c2]
-                styles = ['' for _ in row]
-                win_css = 'color: #00FFA3; font-weight: 700; background-color: rgba(0, 255, 163, 0.05); border-radius: 4px;'
-                lose_css = 'color: #555; font-weight: 400; opacity: 0.5;'
-                try:
-                    val1, val2 = float(v1), float(v2)
-                    if val1 > val2: styles[2], styles[3] = win_css, lose_css
-                    elif val2 > val1: styles[2], styles[3] = lose_css, win_css
-                except: pass
-                return styles
+        def highlight(row):
+            c1, c2 = row.index[2], row.index[3]
+            v1, v2 = row[c1], row[c2]
+            styles = ['' for _ in row]
+            win_css = 'color: #00FFA3; font-weight: 700; background-color: rgba(0, 255, 163, 0.05); border-radius: 4px;'
+            lose_css = 'color: #555; font-weight: 400; opacity: 0.5;'
+            try:
+                val1, val2 = float(v1), float(v2)
+                if val1 > val2: styles[2], styles[3] = win_css, lose_css
+                elif val2 > val1: styles[2], styles[3] = lose_css, win_css
+            except: pass
+            return styles
 
-            st.dataframe(comp_df.style.apply(highlight, axis=1).format(smart_format, subset=comp_df.columns[2:]), use_container_width=True, height=500, hide_index=True)
+        st.dataframe(comp_df.style.apply(highlight, axis=1).format(smart_format, subset=comp_df.columns[2:]), use_container_width=True, height=500, hide_index=True)
+
+# =============================================================================
+# TAB 3: ROLE RANKING (NEW)
+# =============================================================================
+with tab3:
+    st.markdown("### 🏆 ROLE LEADERBOARD")
+    c1, c2 = st.columns([2, 1])
+    
+    with c1:
+        target_role = st.selectbox("Select Role to Rank", sorted(df['Role_Name'].unique()))
+    with c2:
+        top_n = st.slider("Top N Players", 5, 100, 20)
+    
+    # Filter and Sort
+    role_df = df[df['Role_Name'] == target_role].sort_values('Role_Probability', ascending=False).head(top_n)
+    
+    # Show Data
+    st.dataframe(
+        role_df[['Player', 'Squad', 'Season', 'Age', 'Role_Probability', 'Goals', 'Assists', 'Minutes']],
+        use_container_width=True,
+        height=600,
+        column_config={
+            "Role_Probability": st.column_config.ProgressColumn(
+                "AI Confidence",
+                help="How well the player fits this role",
+                format="%.2f",
+                min_value=0,
+                max_value=1,
+            ),
+        },
+        hide_index=True
+    )
+
+# =============================================================================
+# TAB 4: SIMILARITY SEARCH (NEW)
+# =============================================================================
+with tab4:
+    st.markdown("### 🧬 FIND SIMILAR PLAYERS (NEAREST NEIGHBORS)")
+    
+    c1, c2 = st.columns([2, 1])
+    with c1:
+        target_player_name = st.selectbox("Select Base Player", sorted(df['Display_Name'].unique()), key="sim_search")
+    with c2:
+        neighbor_count = st.slider("Number of Neighbors", 5, 20, 10)
+    
+    if target_player_name:
+        target_player = df[df['Display_Name'] == target_player_name].iloc[0]
+        
+        # Calculate Distances
+        # (x-x1)^2 + ...
+        distances = np.sqrt(
+            (df['x'] - target_player['x'])**2 + 
+            (df['y'] - target_player['y'])**2 + 
+            (df['z'] - target_player['z'])**2
+        )
+        df['Distance'] = distances
+        
+        # Get Neighbors (Exclude self)
+        neighbors = df[df['Display_Name'] != target_player_name].sort_values('Distance').head(neighbor_count)
+        
+        # 3D Visual
+        fig_sim = go.Figure()
+        
+        # 1. Target Player (Gold)
+        fig_sim.add_trace(go.Scatter3d(
+            x=[target_player['x']], y=[target_player['y']], z=[target_player['z']],
+            mode='markers+text', marker=dict(size=25, color='#FFD700', symbol='diamond'),
+            name='TARGET', text=[target_player['Player']], textposition="top center"
+        ))
+        
+        # 2. Neighbors (Cyan)
+        fig_sim.add_trace(go.Scatter3d(
+            x=neighbors['x'], y=neighbors['y'], z=neighbors['z'],
+            mode='markers', marker=dict(size=10, color='#00FFFF', opacity=0.8),
+            name='Similar', hovertext=neighbors['Display_Name']
+        ))
+        
+        # 3. Background (Dimmed)
+        fig_sim.add_trace(go.Scatter3d(
+            x=df['x'], y=df['y'], z=df['z'],
+            mode='markers', marker=dict(size=2, color='#333', opacity=0.1),
+            hoverinfo='skip', name='Others'
+        ))
+        
+        fig_sim.update_layout(
+            scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor='rgba(0,0,0,0)'),
+            paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=0, r=0, b=0, t=0), height=500, showlegend=True
+        )
+        st.plotly_chart(fig_sim, use_container_width=True)
+        
+        # Table
+        st.markdown("#### 📋 Neighbors List")
+        st.dataframe(
+            neighbors[['Player', 'Squad', 'Role_Name', 'Distance', 'Goals', 'Assists']],
+            use_container_width=True,
+            hide_index=True
+        )
 
 # FOOTER
 st.markdown("---")
 st.markdown("""<div style="text-align: center; color: #444; font-size: 0.8rem;">EYEBALL INTELLIGENCE © 2026</div>""", unsafe_allow_html=True)
-
