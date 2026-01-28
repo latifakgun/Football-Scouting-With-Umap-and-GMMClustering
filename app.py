@@ -93,7 +93,7 @@ role_color_map = {
     "Central Defender (Standard)": "#00188F", "Commanding Center Back": "#FFFFFF"
 }
 
-# 4. SIDEBAR (LOGO)
+# 4. SIDEBAR
 # ---------------------------------------------------------
 with st.sidebar:
     st.markdown("<h1 style='font-size: 3rem; margin-bottom: 0;'>EYEBALL<span style='color:#00FFA3'>.</span></h1>", unsafe_allow_html=True)
@@ -104,16 +104,15 @@ with st.sidebar:
 st.markdown('<h1 style="font-size: 3rem; margin-bottom: 0;">SCOUTING INTELLIGENCE</h1>', unsafe_allow_html=True)
 st.markdown('<p style="color:#888; margin-bottom: 30px; font-size: 1.1rem;">Next-generation 3D clustering & performance analysis suite.</p>', unsafe_allow_html=True)
 
-# SEKME YAPISI (4 SEKME)
 tab1, tab2, tab3, tab4 = st.tabs([
     "🌍 3D EXPLORATION", 
     "⚔️ PLAYER COMPARISON", 
-    "🏆 ROLE RANKING", 
+    "🏆 ROLE LEADERBOARD", 
     "🧬 SIMILARITY SEARCH"
 ])
 
 # =============================================================================
-# TAB 1: 3D EXPLORATION (FILTERS)
+# TAB 1: 3D EXPLORATION
 # =============================================================================
 with tab1:
     st.markdown("### 🎛️ DATA CONTROLS")
@@ -180,7 +179,7 @@ with tab1:
         else: st.warning("No players match.")
 
 # =============================================================================
-# TAB 2: PLAYER COMPARISON (WITH 3D & IMPROVED RADAR)
+# TAB 2: PLAYER COMPARISON
 # =============================================================================
 with tab2:
     col_sel1, col_sel2 = st.columns(2)
@@ -195,69 +194,34 @@ with tab2:
         
         st.markdown("---")
 
-        # 1. INFO CARDS
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("PLAYER 1", p1['Player'], f"{p1['Role_Name']}")
         c2.metric("TEAM", p1['Squad'], p1['Season'])
         c3.metric("PLAYER 2", p2['Player'], f"{p2['Role_Name']}")
         c4.metric("TEAM", p2['Squad'], p2['Season'])
 
-        # 2. 3D DISTANCE VISUALIZATION
         st.markdown("<br>", unsafe_allow_html=True)
         col_3d, col_radar = st.columns([1, 1])
         
         with col_3d:
             st.markdown("##### 📏 3D PROXIMITY")
             ignore_others = st.checkbox("Ignore Others (Focus Mode)", value=False)
-            
-            # Mesafeyi Hesapla (Euclidean)
             dist = np.linalg.norm(np.array([p1['x'], p1['y'], p1['z']]) - np.array([p2['x'], p2['y'], p2['z']]))
-            similarity_score = max(0, 100 - (dist * 5)) # Basit bir benzerlik skoru algoritması
-            
-            st.caption(f"Spatial Distance: {dist:.2f} | Similarity Score: %{similarity_score:.1f}")
+            sim_score = max(0, 100 - (dist * 5))
+            st.caption(f"Spatial Distance: {dist:.2f} | Similarity: %{sim_score:.1f}")
 
-            # 3D Grafik Çizimi
             fig_comp = go.Figure()
-
-            # Arkadaki kalabalık
             if not ignore_others:
-                fig_comp.add_trace(go.Scatter3d(
-                    x=df['x'], y=df['y'], z=df['z'],
-                    mode='markers', marker=dict(size=3, color='#333', opacity=0.3),
-                    hoverinfo='skip', name='Others'
-                ))
-            
-            # Oyuncu 1
-            fig_comp.add_trace(go.Scatter3d(
-                x=[p1['x']], y=[p1['y']], z=[p1['z']],
-                mode='markers+text', marker=dict(size=20, color='#00FFA3'),
-                name=p1['Player'], text=[p1['Player']], textposition="top center"
-            ))
-            
-            # Oyuncu 2
-            fig_comp.add_trace(go.Scatter3d(
-                x=[p2['x']], y=[p2['y']], z=[p2['z']],
-                mode='markers+text', marker=dict(size=20, color='#00D2FF'),
-                name=p2['Player'], text=[p2['Player']], textposition="top center"
-            ))
-            
-            # Çizgi çek
-            fig_comp.add_trace(go.Scatter3d(
-                x=[p1['x'], p2['x']], y=[p1['y'], p2['y']], z=[p1['z'], p2['z']],
-                mode='lines', line=dict(color='white', width=2, dash='dash'),
-                name='Distance'
-            ))
-
-            fig_comp.update_layout(
-                scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor='rgba(0,0,0,0)'),
-                paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=0, r=0, b=0, t=0), height=400, showlegend=False
-            )
+                fig_comp.add_trace(go.Scatter3d(x=df['x'], y=df['y'], z=df['z'], mode='markers', marker=dict(size=3, color='#333', opacity=0.3), hoverinfo='skip', name='Others'))
+            fig_comp.add_trace(go.Scatter3d(x=[p1['x']], y=[p1['y']], z=[p1['z']], mode='markers+text', marker=dict(size=20, color='#00FFA3'), name=p1['Player'], text=[p1['Player']], textposition="top center"))
+            fig_comp.add_trace(go.Scatter3d(x=[p2['x']], y=[p2['y']], z=[p2['z']], mode='markers+text', marker=dict(size=20, color='#00D2FF'), name=p2['Player'], text=[p2['Player']], textposition="top center"))
+            fig_comp.add_trace(go.Scatter3d(x=[p1['x'], p2['x']], y=[p1['y'], p2['y']], z=[p1['z'], p2['z']], mode='lines', line=dict(color='white', width=2, dash='dash'), name='Distance'))
+            fig_comp.update_layout(scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor='rgba(0,0,0,0)'), paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=0, r=0, b=0, t=0), height=400, showlegend=False)
             st.plotly_chart(fig_comp, use_container_width=True)
 
         with col_radar:
             st.markdown("##### ⚡ SKILL OVERLAP")
             radar_metrics = ['Goals', 'Assists', 'Shots', 'SoT', 'Dribbles_Succ', 'Prg_Pass_Dist', 'Tackles', 'Interceptions', 'Blocks']
-            
             v1_raw = [p1.get(m, 0) for m in radar_metrics]
             v2_raw = [p2.get(m, 0) for m in radar_metrics]
             v1_norm, v2_norm = [], []
@@ -268,26 +232,11 @@ with tab2:
                 v2_norm.append(val2/mx)
                 
             fig_radar = go.Figure()
-            # Şeffaflık (Opacity) ayarlandı ve çizgi modu eklendi
-            fig_radar.add_trace(go.Scatterpolar(
-                r=v1_norm, theta=radar_metrics, fill='toself', name=p1['Player'],
-                text=v1_raw, hoverinfo="text+theta+name", 
-                line=dict(color='#00FFA3', width=3), fillcolor='rgba(0, 255, 163, 0.1)'
-            ))
-            fig_radar.add_trace(go.Scatterpolar(
-                r=v2_norm, theta=radar_metrics, fill='toself', name=p2['Player'],
-                text=v2_raw, hoverinfo="text+theta+name", 
-                line=dict(color='#00D2FF', width=3), fillcolor='rgba(0, 210, 255, 0.1)'
-            ))
-            
-            fig_radar.update_layout(
-                polar=dict(radialaxis=dict(visible=False), bgcolor='#111'),
-                paper_bgcolor='rgba(0,0,0,0)', margin=dict(t=30, b=30, l=30, r=30), height=400,
-                showlegend=True, legend=dict(font=dict(color="white"), orientation="h")
-            )
+            fig_radar.add_trace(go.Scatterpolar(r=v1_norm, theta=radar_metrics, fill='toself', name=p1['Player'], text=v1_raw, hoverinfo="text+theta+name", line=dict(color='#00FFA3', width=3), fillcolor='rgba(0, 255, 163, 0.1)'))
+            fig_radar.add_trace(go.Scatterpolar(r=v2_norm, theta=radar_metrics, fill='toself', name=p2['Player'], text=v2_raw, hoverinfo="text+theta+name", line=dict(color='#00D2FF', width=3), fillcolor='rgba(0, 210, 255, 0.1)'))
+            fig_radar.update_layout(polar=dict(radialaxis=dict(visible=False), bgcolor='#111'), paper_bgcolor='rgba(0,0,0,0)', margin=dict(t=30, b=30, l=30, r=30), height=400, showlegend=True, legend=dict(font=dict(color="white"), orientation="h"))
             st.plotly_chart(fig_radar, use_container_width=True)
 
-        # 3. STATS MATRIX (UNCHANGED)
         st.markdown("##### 📋 DETAILED STATS")
         compare_metrics = {
             'ATTACK': ['Goals', 'Assists', 'Shots', 'SoT', 'npxG_p90', 'xA_p90'],
@@ -321,42 +270,64 @@ with tab2:
         st.dataframe(comp_df.style.apply(highlight, axis=1).format(smart_format, subset=comp_df.columns[2:]), use_container_width=True, height=500, hide_index=True)
 
 # =============================================================================
-# TAB 3: ROLE RANKING (NEW)
+# TAB 3: ROLE LEADERBOARD (SMART RANKING)
 # =============================================================================
 with tab3:
-    st.markdown("### 🏆 ROLE LEADERBOARD")
+    st.markdown("### 🏆 ROLE LEADERBOARD (Archetype Ranking)")
+    st.info("Ranking Logic: Players are sorted by AI Confidence first. If confidence is 100%, they are ranked by their proximity to the role's geometric center (Purest Style).")
+
     c1, c2 = st.columns([2, 1])
     
     with c1:
         target_role = st.selectbox("Select Role to Rank", sorted(df['Role_Name'].unique()))
     with c2:
-        top_n = st.slider("Top N Players", 5, 100, 20)
+        top_n = st.slider("Top N Players", 5, 200, 50)
     
-    # Filter and Sort
-    role_df = df[df['Role_Name'] == target_role].sort_values('Role_Probability', ascending=False).head(top_n)
+    # 1. ROLDEKİ OYUNCULARI AL
+    role_df = df[df['Role_Name'] == target_role].copy()
     
-    # Show Data
+    # 2. MERKEZİ (CENTROID) HESAPLA
+    centroid = role_df[['x', 'y', 'z']].mean()
+    
+    # 3. MERKEZE UZAKLIĞI HESAPLA
+    role_df['Dist_to_Center'] = np.sqrt(
+        (role_df['x'] - centroid['x'])**2 +
+        (role_df['y'] - centroid['y'])**2 +
+        (role_df['z'] - centroid['z'])**2
+    )
+    
+    # 4. SIRALAMA: Önce Olasılık (Yüksekten Düşüğe), Sonra Mesafe (Düşükten Yükseğe)
+    role_df = role_df.sort_values(by=['Role_Probability', 'Dist_to_Center'], ascending=[False, True]).head(top_n)
+    
+    # Gösterilecek Sütunlar
+    display_cols = ['Player', 'Squad', 'Season', 'Age', 'Role_Probability', 'Dist_to_Center', 'Goals', 'Assists', 'Minutes']
+    
     st.dataframe(
-        role_df[['Player', 'Squad', 'Season', 'Age', 'Role_Probability', 'Goals', 'Assists', 'Minutes']],
+        role_df[display_cols],
         use_container_width=True,
         height=600,
         column_config={
             "Role_Probability": st.column_config.ProgressColumn(
                 "AI Confidence",
-                help="How well the player fits this role",
-                format="%.2f",
+                help="Probability of belonging to this role",
+                format="%.4f", # 4 hane göster ki fark belli olsun
                 min_value=0,
                 max_value=1,
             ),
+            "Dist_to_Center": st.column_config.NumberColumn(
+                "Archetype Dist.",
+                help="Distance to the geometric center of this role. Lower is better (Purer style).",
+                format="%.2f"
+            )
         },
         hide_index=True
     )
 
 # =============================================================================
-# TAB 4: SIMILARITY SEARCH (NEW)
+# TAB 4: SIMILARITY SEARCH
 # =============================================================================
 with tab4:
-    st.markdown("### 🧬 FIND SIMILAR PLAYERS (NEAREST NEIGHBORS)")
+    st.markdown("### 🧬 NEAREST NEIGHBORS")
     
     c1, c2 = st.columns([2, 1])
     with c1:
@@ -366,57 +337,18 @@ with tab4:
     
     if target_player_name:
         target_player = df[df['Display_Name'] == target_player_name].iloc[0]
-        
-        # Calculate Distances
-        # (x-x1)^2 + ...
-        distances = np.sqrt(
-            (df['x'] - target_player['x'])**2 + 
-            (df['y'] - target_player['y'])**2 + 
-            (df['z'] - target_player['z'])**2
-        )
+        distances = np.sqrt((df['x'] - target_player['x'])**2 + (df['y'] - target_player['y'])**2 + (df['z'] - target_player['z'])**2)
         df['Distance'] = distances
-        
-        # Get Neighbors (Exclude self)
         neighbors = df[df['Display_Name'] != target_player_name].sort_values('Distance').head(neighbor_count)
         
-        # 3D Visual
         fig_sim = go.Figure()
-        
-        # 1. Target Player (Gold)
-        fig_sim.add_trace(go.Scatter3d(
-            x=[target_player['x']], y=[target_player['y']], z=[target_player['z']],
-            mode='markers+text', marker=dict(size=25, color='#FFD700', symbol='diamond'),
-            name='TARGET', text=[target_player['Player']], textposition="top center"
-        ))
-        
-        # 2. Neighbors (Cyan)
-        fig_sim.add_trace(go.Scatter3d(
-            x=neighbors['x'], y=neighbors['y'], z=neighbors['z'],
-            mode='markers', marker=dict(size=10, color='#00FFFF', opacity=0.8),
-            name='Similar', hovertext=neighbors['Display_Name']
-        ))
-        
-        # 3. Background (Dimmed)
-        fig_sim.add_trace(go.Scatter3d(
-            x=df['x'], y=df['y'], z=df['z'],
-            mode='markers', marker=dict(size=2, color='#333', opacity=0.1),
-            hoverinfo='skip', name='Others'
-        ))
-        
-        fig_sim.update_layout(
-            scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor='rgba(0,0,0,0)'),
-            paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=0, r=0, b=0, t=0), height=500, showlegend=True
-        )
+        fig_sim.add_trace(go.Scatter3d(x=[target_player['x']], y=[target_player['y']], z=[target_player['z']], mode='markers+text', marker=dict(size=25, color='#FFD700', symbol='diamond'), name='TARGET', text=[target_player['Player']], textposition="top center"))
+        fig_sim.add_trace(go.Scatter3d(x=neighbors['x'], y=neighbors['y'], z=neighbors['z'], mode='markers', marker=dict(size=10, color='#00FFFF', opacity=0.8), name='Similar', hovertext=neighbors['Display_Name']))
+        fig_sim.add_trace(go.Scatter3d(x=df['x'], y=df['y'], z=df['z'], mode='markers', marker=dict(size=2, color='#333', opacity=0.1), hoverinfo='skip', name='Others'))
+        fig_sim.update_layout(scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor='rgba(0,0,0,0)'), paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=0, r=0, b=0, t=0), height=500, showlegend=True)
         st.plotly_chart(fig_sim, use_container_width=True)
         
-        # Table
-        st.markdown("#### 📋 Neighbors List")
-        st.dataframe(
-            neighbors[['Player', 'Squad', 'Role_Name', 'Distance', 'Goals', 'Assists']],
-            use_container_width=True,
-            hide_index=True
-        )
+        st.dataframe(neighbors[['Player', 'Squad', 'Role_Name', 'Distance', 'Goals', 'Assists']], use_container_width=True, hide_index=True)
 
-# FOOTER
 st.markdown("---")
 st.markdown("""<div style="text-align: center; color: #444; font-size: 0.8rem;">EYEBALL INTELLIGENCE © 2026</div>""", unsafe_allow_html=True)
