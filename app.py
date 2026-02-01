@@ -99,13 +99,10 @@ CLUSTER_NAME_MAP = {
 
 @st.cache_data
 def load_data():
-    # Dosya adını senin kodundaki gibi bıraktım
-    df = pd.read_csv("Eyeball_Streamlit_Finalv2.csv") 
+    # Yeni oluşturduğumuz İSİMLİ dosyayı oku
+    df = pd.read_csv("Eyeball_Streamlit_Final_Named.csv")
     
-    # Cluster ID'leri İsimlere Çevir (Mapping Uygula)
-    if 'Cluster_ID' in df.columns:
-        df['Role_Name'] = df['Cluster_ID'].map(CLUSTER_NAME_MAP)
-        
+    # Display Name oluştur
     df['Display_Name'] = df['Player'] + " (" + df['Season'].astype(str) + ") - " + df['Squad']
     return df
 
@@ -400,3 +397,4 @@ with tab4:
 
 st.markdown("---")
 st.markdown("""<div style="text-align: center; color: #444; font-size: 0.8rem;">EYEBALL INTELLIGENCE © 2026</div>""", unsafe_allow_html=True)
+
