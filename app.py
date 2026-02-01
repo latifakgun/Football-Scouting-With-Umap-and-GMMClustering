@@ -67,11 +67,45 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. DATA LOADING
+# 3. MAPPING & DATA LOADING
 # ---------------------------------------------------------
+
+# CLUSTER ID -> ROLE NAME MAPPING
+# Modelden çıkan sayısal ID'leri gerçek futbol rollerine çevirir.
+CLUSTER_NAME_MAP = {
+    # DEFENDERS (0-4)
+    0: "Ball Playing Defender",
+    1: "Stopper / No-Nonsense CB",
+    2: "Conservative Defender",
+    3: "Progressive Defender",
+    4: "Commanding Center Back",
+    
+    # MIDFIELDERS (10-15)
+    10: "Deep-Lying Playmaker",
+    11: "Ball Winning Midfielder",
+    12: "Advanced Playmaker",
+    13: "Box-to-Box Midfielder",
+    14: "Wide Midfielder",
+    15: "Dynamic Midfielder / Mezzala",
+    
+    # ATTACKERS (20-25)
+    20: "Target Man / Aerial Threat",
+    21: "Creative Winger",
+    22: "Complete Forward",
+    23: "Direct Winger / Dribbler",
+    24: "Pressing Forward",
+    25: "Poacher / Penalty Box Striker"
+}
+
 @st.cache_data
 def load_data():
-    df = pd.read_csv("eyeball_streamlit_final.csv")
+    # Dosya adını senin kodundaki gibi bıraktım
+    df = pd.read_csv("Eyeball_Streamlit_Finalv2.csv") 
+    
+    # Cluster ID'leri İsimlere Çevir (Mapping Uygula)
+    if 'Cluster_ID' in df.columns:
+        df['Role_Name'] = df['Cluster_ID'].map(CLUSTER_NAME_MAP)
+        
     df['Display_Name'] = df['Player'] + " (" + df['Season'].astype(str) + ") - " + df['Squad']
     return df
 
@@ -81,16 +115,30 @@ except FileNotFoundError:
     st.error("ERROR: CSV file not found.")
     st.stop()
 
-# COLOR MAP
+# COLOR MAP (YENİ ROLLERE GÖRE GÜNCELLENDİ)
 role_color_map = {
-    "Inverted Winger / Dribbler": "#FF2A6D", "Elite Speedster / Direct Winger": "#D300C5",
-    "Poacher / Penalty Box Striker": "#FF9600", "Versatile Forward / Second Striker": "#F5D300",
-    "Target Man / Aerial Threat": "#B800F5", "Pressing Forward": "#00F562",
-    "Technical Hub / Deep Playmaker": "#05D9E8", "Progressive Passer / Controller": "#0056F5",
-    "Physical Ball Carrier": "#6500F5", "Defensive Midfielder / Anchor": "#8F4300",
-    "Wide Midfielder / Defensive Winger": "#00F5A0", "Utility Player / Workhorse": "#777777",
-    "Deep Distributor / Ball Playing CB": "#00E0C6", "Stopper / No-Nonsense Defender": "#8F001A",
-    "Central Defender (Standard)": "#00188F", "Commanding Center Back": "#FFFFFF"
+    # Defans (Mavi/Mor Tonları)
+    "Ball Playing Defender": "#00BFFF",      # Deep Sky Blue
+    "Stopper / No-Nonsense CB": "#8B0000",   # Dark Red
+    "Conservative Defender": "#483D8B",      # Dark Slate Blue
+    "Progressive Defender": "#1E90FF",       # Dodger Blue
+    "Commanding Center Back": "#000080",     # Navy
+    
+    # Orta Saha (Yeşil/Turkuaz Tonları)
+    "Deep-Lying Playmaker": "#2E8B57",       # Sea Green
+    "Ball Winning Midfielder": "#556B2F",    # Dark Olive Green
+    "Advanced Playmaker": "#00FF7F",         # Spring Green
+    "Box-to-Box Midfielder": "#32CD32",      # Lime Green
+    "Wide Midfielder": "#20B2AA",            # Light Sea Green
+    "Dynamic Midfielder / Mezzala": "#00FFFF", # Cyan
+
+    # Hücum (Kırmızı/Turuncu/Pembe Tonları)
+    "Target Man / Aerial Threat": "#FF4500", # Orange Red
+    "Creative Winger": "#FF1493",            # Deep Pink
+    "Complete Forward": "#FFD700",           # Gold
+    "Direct Winger / Dribbler": "#FF00FF",   # Magenta
+    "Pressing Forward": "#CD5C5C",           # Indian Red
+    "Poacher / Penalty Box Striker": "#FF0000" # Red
 }
 
 # 4. SIDEBAR
